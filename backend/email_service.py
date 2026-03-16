@@ -12,7 +12,7 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER = os.getenv("SMTP_USER", "")
 SMTP_PASS = os.getenv("SMTP_PASS", "")
 FROM_EMAIL = os.getenv("FROM_EMAIL", "noreply@vietnamtours.com")
-FROM_NAME = os.getenv("FROM_NAME", "Vietnam Tours")
+FROM_NAME = os.getenv("FROM_NAME", "Travel VN Tours")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@vietnamtours.com")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
@@ -50,13 +50,13 @@ def _base_template(content: str) -> str:
     return f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #0f766e;">
-        <h1 style="color: #0f766e; margin: 0; font-size: 24px;">Vietnam Tours</h1>
+        <h1 style="color: #0f766e; margin: 0; font-size: 24px;">Travel VN Tours</h1>
       </div>
       <div style="padding: 30px 0;">
         {content}
       </div>
       <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center; color: #64748b; font-size: 13px;">
-        <p>Vietnam Tours &mdash; Unforgettable adventures through Vietnam</p>
+        <p>Travel VN Tours &mdash; Unforgettable adventures through Vietnam</p>
       </div>
     </div>
     """
