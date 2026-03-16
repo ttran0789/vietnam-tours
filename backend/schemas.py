@@ -117,3 +117,4 @@ class TransportBookingResponse(BaseModel):
 
 class PaymentIntentCreate(BaseModel):
     booking_id: int
+    booking_type: str = "tour"  # "tour" or "transport"

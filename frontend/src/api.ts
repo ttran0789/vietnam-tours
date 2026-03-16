@@ -98,10 +98,10 @@ export const api = {
       body: JSON.stringify({ admin_notes: adminNotes }),
     }),
 
-  createPaymentIntent: (bookingId: number) =>
+  createPaymentIntent: (bookingId: number, bookingType: string = 'tour') =>
     request<{ client_secret: string }>('/payments/create-intent', {
       method: 'POST',
-      body: JSON.stringify({ booking_id: bookingId }),
+      body: JSON.stringify({ booking_id: bookingId, booking_type: bookingType }),
     }),
 
   getStripeConfig: () =>

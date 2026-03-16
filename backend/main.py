@@ -416,9 +416,15 @@ def create_payment_intent(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    booking = db.query(Booking).filter(
-        Booking.id == data.booking_id, Booking.user_id == user.id
-    ).first()
+    if data.booking_type == "transport":
+        booking = db.query(TransportBooking).filter(
+            TransportBooking.id == data.booking_id, TransportBooking.user_id == user.id
+        ).first()
+    else:
+        booking = db.query(Booking).filter(
+            Booking.id == data.booking_id, Booking.user_id == user.id
+        ).first()
+
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     if booking.status != BookingStatus.APPROVED:
@@ -433,7 +439,11 @@ def create_payment_intent(
             currency="usd",
             automatic_payment_methods={"enabled": False},
             payment_method_types=["card", "klarna"],
-            metadata={"booking_id": booking.id, "user_id": user.id},
+            metadata={
+                "booking_id": booking.id,
+                "booking_type": data.booking_type,
+                "user_id": user.id,
+            },
         )
     except stripe.error.AuthenticationError:
         raise HTTPException(status_code=400, detail="Stripe is not configured. Add your Stripe keys to the .env file.")
@@ -457,16 +467,27 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     if event["type"] == "payment_intent.succeeded":
         intent = event["data"]["object"]
         booking_id = intent["metadata"].get("booking_id")
-        if booking_id:
-            booking = db.query(Booking).filter(Booking.id == int(booking_id)).first()
-            if booking:
-                booking.status = BookingStatus.CONFIRMED
-                db.commit()
+        booking_type = intent["metadata"].get("booking_type", "tour")
 
-                user = db.query(User).filter(User.id == booking.user_id).first()
-                tour = db.query(Tour).filter(Tour.id == booking.tour_id).first()
-                if user and tour:
-                    send_payment_confirmed(user.email, user.name, tour.name, booking.start_date, booking.num_guests, booking.total_price)
+        if booking_id:
+            if booking_type == "transport":
+                tb = db.query(TransportBooking).filter(TransportBooking.id == int(booking_id)).first()
+                if tb:
+                    tb.status = BookingStatus.CONFIRMED
+                    db.commit()
+                    user = db.query(User).filter(User.id == tb.user_id).first()
+                    route = db.query(TransportRoute).filter(TransportRoute.id == tb.route_id).first()
+                    if user and route:
+                        send_payment_confirmed(user.email, user.name, f"{route.origin} → {route.destination}", tb.travel_date, tb.num_passengers, tb.total_price)
+            else:
+                booking = db.query(Booking).filter(Booking.id == int(booking_id)).first()
+                if booking:
+                    booking.status = BookingStatus.CONFIRMED
+                    db.commit()
+                    user = db.query(User).filter(User.id == booking.user_id).first()
+                    tour = db.query(Tour).filter(Tour.id == booking.tour_id).first()
+                    if user and tour:
+                        send_payment_confirmed(user.email, user.name, tour.name, booking.start_date, booking.num_guests, booking.total_price)
 
     return {"status": "ok"}
 

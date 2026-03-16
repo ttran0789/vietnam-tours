@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
@@ -64,6 +64,8 @@ function CheckoutForm({ bookingId }: { bookingId: number }) {
 
 export default function PaymentPage() {
   const { bookingId } = useParams<{ bookingId: string }>()
+  const [searchParams] = useSearchParams()
+  const bookingType = searchParams.get('type') || 'tour'
   const { t } = useTranslation()
   const [clientSecret, setClientSecret] = useState('')
   const [stripePromise, setStripePromise] = useState<any>(null)
@@ -86,7 +88,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     if (!configChecked || noStripe || !bookingId) return
-    api.createPaymentIntent(Number(bookingId))
+    api.createPaymentIntent(Number(bookingId), bookingType)
       .then((data) => setClientSecret(data.client_secret))
       .catch((e) => {
         if (e.message.toLowerCase().includes('stripe')) {

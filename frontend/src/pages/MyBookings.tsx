@@ -147,6 +147,11 @@ export default function MyBookings() {
                       )}
                     </div>
                     <div className="booking-item-actions">
+                      {tb.status === 'approved' && (
+                        <Link to={`/payment/${tb.id}?type=transport`} className="btn btn-primary btn-sm">
+                          {t('bookings.payNow')}
+                        </Link>
+                      )}
                       {(tb.status === 'pending' || tb.status === 'approved') && (
                         <button onClick={() => handleCancelTransport(tb.id)} className="btn btn-outline btn-sm">
                           {t('bookings.cancel')}

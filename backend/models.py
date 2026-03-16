@@ -95,6 +95,7 @@ class TransportBooking(Base):
     comments = Column(Text, default="")
     admin_notes = Column(Text, default="")
     pickup_location = Column(String, default="")
+    stripe_payment_intent_id = Column(String)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", backref="transport_bookings")
