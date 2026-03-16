@@ -432,7 +432,7 @@ def create_payment_intent(
             amount=int(booking.total_price * 100),  # cents
             currency="usd",
             automatic_payment_methods={"enabled": False},
-            payment_method_types=["card"],
+            payment_method_types=["card", "klarna"],
             metadata={"booking_id": booking.id, "user_id": user.id},
         )
     except stripe.error.AuthenticationError:

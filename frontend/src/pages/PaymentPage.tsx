@@ -52,7 +52,7 @@ function CheckoutForm({ bookingId }: { bookingId: number }) {
     <form onSubmit={handleSubmit} className="payment-form">
       <PaymentElement options={{
         layout: 'tabs',
-        paymentMethodOrder: ['card'],
+        paymentMethodOrder: ['card', 'klarna'],
       }} />
       {error && <div className="error-message">{error}</div>}
       <button type="submit" className="btn btn-primary btn-block" disabled={!stripe || processing}>
