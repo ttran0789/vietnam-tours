@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '../api'
-import { Booking } from '../types'
+import { Booking, TransportBooking } from '../types'
 
 interface Stats {
   total_customers: number
@@ -27,17 +27,21 @@ const FILTER_OPTIONS = ['all', 'pending', 'approved', 'confirmed', 'rejected', '
 
 export default function AdminBookings() {
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [transportBookings, setTransportBookings] = useState<TransportBooking[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('pending')
-  const [actionNotes, setActionNotes] = useState<Record<number, string>>({})
+  const [tab, setTab] = useState<'tours' | 'transport'>('tours')
+  const [actionNotes, setActionNotes] = useState<Record<string, string>>({})
   const { t } = useTranslation()
 
   const fetchBookings = () => {
     setLoading(true)
-    api.getAdminBookings(filter === 'all' ? undefined : filter)
-      .then((data: any) => setBookings(data))
-      .finally(() => setLoading(false))
+    const statusFilter = filter === 'all' ? undefined : filter
+    Promise.all([
+      api.getAdminBookings(statusFilter).then((data: any) => setBookings(data)),
+      api.getAdminTransportBookings(statusFilter).then((data: any) => setTransportBookings(data)),
+    ]).finally(() => setLoading(false))
   }
 
   const fetchStats = () => {
@@ -47,14 +51,26 @@ export default function AdminBookings() {
   useEffect(() => { fetchStats() }, [])
   useEffect(() => { fetchBookings() }, [filter])
 
-  const handleApprove = async (id: number) => {
-    await api.approveBooking(id, actionNotes[id] || '')
+  const handleApproveTour = async (id: number) => {
+    await api.approveBooking(id, actionNotes[`tour-${id}`] || '')
     fetchBookings()
     fetchStats()
   }
 
-  const handleReject = async (id: number) => {
-    await api.rejectBooking(id, actionNotes[id] || '')
+  const handleRejectTour = async (id: number) => {
+    await api.rejectBooking(id, actionNotes[`tour-${id}`] || '')
+    fetchBookings()
+    fetchStats()
+  }
+
+  const handleApproveTransport = async (id: number) => {
+    await api.approveTransportBooking(id, actionNotes[`transport-${id}`] || '')
+    fetchBookings()
+    fetchStats()
+  }
+
+  const handleRejectTransport = async (id: number) => {
+    await api.rejectTransportBooking(id, actionNotes[`transport-${id}`] || '')
     fetchBookings()
     fetchStats()
   }
@@ -109,7 +125,20 @@ export default function AdminBookings() {
         </>
       )}
 
-      <h2 className="admin-section-title">{t('admin.bookingsSection')}</h2>
+      <div className="bookings-tabs" style={{ marginBottom: '0.75rem' }}>
+        <button
+          className={`btn btn-sm ${tab === 'tours' ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => setTab('tours')}
+        >
+          {t('nav.tours')} ({bookings.length})
+        </button>
+        <button
+          className={`btn btn-sm ${tab === 'transport' ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => setTab('transport')}
+        >
+          {t('nav.transport')} ({transportBookings.length})
+        </button>
+      </div>
 
       <div className="admin-filters">
         {FILTER_OPTIONS.map(opt => (
@@ -125,60 +154,119 @@ export default function AdminBookings() {
 
       {loading ? (
         <div className="loading">{t('tour.loading')}</div>
-      ) : bookings.length === 0 ? (
-        <div className="empty-state">
-          <h2>{t('admin.noBookings')}</h2>
-        </div>
-      ) : (
-        <div className="bookings-list">
-          {bookings.map(booking => (
-            <div key={booking.id} className="booking-item admin-booking-item">
-              <div className="booking-item-info">
-                <h3>{booking.tour?.name || `Tour #${booking.tour_id}`}</h3>
-                <div className="booking-item-details">
-                  <span>{t('admin.customer')}: {booking.user?.name} ({booking.user?.email})</span>
-                </div>
-                <div className="booking-item-details">
-                  <span>{t('bookings.date', { date: booking.start_date })}</span>
-                  <span>{t('bookings.guests', { count: booking.num_guests })}</span>
-                  <span>{t('bookings.total', { amount: booking.total_price.toFixed(2) })}</span>
-                </div>
-                <span className={`status-badge ${STATUS_STYLES[booking.status] || ''}`}>
-                  {t(`bookings.status.${booking.status}`)}
-                </span>
-                {booking.comments && (
-                  <div className="admin-comments">
-                    <strong>{t('admin.customerComments')}:</strong> {booking.comments}
+      ) : tab === 'tours' ? (
+        bookings.length === 0 ? (
+          <div className="empty-state"><h2>{t('admin.noBookings')}</h2></div>
+        ) : (
+          <div className="bookings-list">
+            {bookings.map(booking => (
+              <div key={booking.id} className="booking-item admin-booking-item">
+                <div className="booking-item-info">
+                  <h3>{booking.tour?.name || `Tour #${booking.tour_id}`}</h3>
+                  <div className="booking-item-details">
+                    <span>{t('admin.customer')}: {booking.user?.name} ({booking.user?.email})</span>
                   </div>
-                )}
-                {booking.admin_notes && (
-                  <div className="admin-notes-display">
-                    <strong>{t('bookings.adminNotes')}:</strong> {booking.admin_notes}
+                  <div className="booking-item-details">
+                    <span>{t('bookings.date', { date: booking.start_date })}</span>
+                    <span>{t('bookings.guests', { count: booking.num_guests })}</span>
+                    <span>{t('bookings.total', { amount: booking.total_price.toFixed(2) })}</span>
+                  </div>
+                  <span className={`status-badge ${STATUS_STYLES[booking.status] || ''}`}>
+                    {t(`bookings.status.${booking.status}`)}
+                  </span>
+                  {booking.comments && (
+                    <div className="admin-comments">
+                      <strong>{t('admin.customerComments')}:</strong> {booking.comments}
+                    </div>
+                  )}
+                  {booking.admin_notes && (
+                    <div className="admin-notes-display">
+                      <strong>{t('bookings.adminNotes')}:</strong> {booking.admin_notes}
+                    </div>
+                  )}
+                </div>
+                {booking.status === 'pending' && (
+                  <div className="admin-actions">
+                    <input
+                      type="text"
+                      placeholder={t('admin.notesPlaceholder')}
+                      value={actionNotes[`tour-${booking.id}`] || ''}
+                      onChange={e => setActionNotes({ ...actionNotes, [`tour-${booking.id}`]: e.target.value })}
+                      className="admin-notes-input"
+                    />
+                    <div className="admin-action-buttons">
+                      <button onClick={() => handleApproveTour(booking.id)} className="btn btn-primary btn-sm">
+                        {t('admin.approve')}
+                      </button>
+                      <button onClick={() => handleRejectTour(booking.id)} className="btn btn-danger btn-sm">
+                        {t('admin.reject')}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
-              {booking.status === 'pending' && (
-                <div className="admin-actions">
-                  <input
-                    type="text"
-                    placeholder={t('admin.notesPlaceholder')}
-                    value={actionNotes[booking.id] || ''}
-                    onChange={e => setActionNotes({ ...actionNotes, [booking.id]: e.target.value })}
-                    className="admin-notes-input"
-                  />
-                  <div className="admin-action-buttons">
-                    <button onClick={() => handleApprove(booking.id)} className="btn btn-primary btn-sm">
-                      {t('admin.approve')}
-                    </button>
-                    <button onClick={() => handleReject(booking.id)} className="btn btn-danger btn-sm">
-                      {t('admin.reject')}
-                    </button>
+            ))}
+          </div>
+        )
+      ) : (
+        transportBookings.length === 0 ? (
+          <div className="empty-state"><h2>{t('admin.noBookings')}</h2></div>
+        ) : (
+          <div className="bookings-list">
+            {transportBookings.map(tb => (
+              <div key={tb.id} className="booking-item admin-booking-item">
+                <div className="booking-item-info">
+                  <h3>{tb.route ? `${tb.route.origin} → ${tb.route.destination}` : `Route #${tb.route_id}`}</h3>
+                  <div className="booking-item-details">
+                    <span>{t('admin.customer')}: {tb.user?.name} ({tb.user?.email})</span>
                   </div>
+                  <div className="booking-item-details">
+                    <span>{t('bookings.date', { date: tb.travel_date })}</span>
+                    <span>{t('transport.passengersCount', { count: tb.num_passengers })}</span>
+                    <span>{t('bookings.total', { amount: tb.total_price.toFixed(2) })}</span>
+                  </div>
+                  {tb.pickup_location && (
+                    <div className="booking-item-details">
+                      <span>{t('transport.pickup')}: {tb.pickup_location}</span>
+                    </div>
+                  )}
+                  <span className={`status-badge ${STATUS_STYLES[tb.status] || ''}`}>
+                    {t(`bookings.status.${tb.status}`)}
+                  </span>
+                  {tb.comments && (
+                    <div className="admin-comments">
+                      <strong>{t('admin.customerComments')}:</strong> {tb.comments}
+                    </div>
+                  )}
+                  {tb.admin_notes && (
+                    <div className="admin-notes-display">
+                      <strong>{t('bookings.adminNotes')}:</strong> {tb.admin_notes}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
+                {tb.status === 'pending' && (
+                  <div className="admin-actions">
+                    <input
+                      type="text"
+                      placeholder={t('admin.notesPlaceholder')}
+                      value={actionNotes[`transport-${tb.id}`] || ''}
+                      onChange={e => setActionNotes({ ...actionNotes, [`transport-${tb.id}`]: e.target.value })}
+                      className="admin-notes-input"
+                    />
+                    <div className="admin-action-buttons">
+                      <button onClick={() => handleApproveTransport(tb.id)} className="btn btn-primary btn-sm">
+                        {t('admin.approve')}
+                      </button>
+                      <button onClick={() => handleRejectTransport(tb.id)} className="btn btn-danger btn-sm">
+                        {t('admin.reject')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )
       )}
     </div>
   )
