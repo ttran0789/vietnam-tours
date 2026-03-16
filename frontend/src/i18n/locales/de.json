@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "logo": "Vietnam Touren",
+    "tours": "Touren",
+    "myBookings": "Meine Buchungen",
+    "greeting": "Hallo, {{name}}",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "signUp": "Registrieren",
+    "admin": "Admin",
+    "transport": "Transport"
+  },
+  "home": {
+    "heroTitle": "Entdecke Vietnam",
+    "heroSubtitle": "Unvergessliche Abenteuer durch die schönsten Landschaften Südostasiens",
+    "popularTours": "Beliebte Touren",
+    "loadingTours": "Touren werden geladen...",
+    "maxPeople": "Max {{count}} Personen",
+    "perPerson": "/ Person"
+  },
+  "tour": {
+    "loading": "Laden...",
+    "notFound": "Tour nicht gefunden",
+    "highlights": "Höhepunkte",
+    "itinerary": "Reiseplan",
+    "day": "Tag {{number}}",
+    "included": "Inklusivleistungen",
+    "notIncluded": "Nicht Inbegriffen",
+    "maxPeople": "Max {{count}} Personen",
+    "startDate": "Startdatum",
+    "numGuests": "Anzahl der Gäste",
+    "guest": "{{count}} Gast",
+    "guests": "{{count}} Gäste",
+    "total": "Gesamt",
+    "bookNow": "Jetzt Buchen",
+    "submitRequest": "Buchungsanfrage Senden",
+    "booking": "Wird gesendet...",
+    "loginToBook": "Anmelden zum Buchen",
+    "selectDate": "Bitte wähle ein Startdatum",
+    "perPerson": "/ Person",
+    "comments": "Kommentare / Wünsche",
+    "commentsPlaceholder": "Ernährungseinschränkungen, Reisegruppenvorlieben, besondere Wünsche...",
+    "bookingNote": "Noch keine Zahlung erforderlich. Wir prüfen deine Anfrage und melden uns.",
+    "bookingSubmitted": "Anfrage Gesendet!",
+    "bookingSubmittedDesc": "Wir prüfen deine Buchung und benachrichtigen dich nach Genehmigung. Dann kannst du zur Zahlung fortfahren."
+  },
+  "bookings": {
+    "title": "Meine Buchungen",
+    "noBookings": "Noch keine Buchungen",
+    "noBookingsDesc": "Entdecke unsere Touren und buche dein nächstes Vietnam-Abenteuer!",
+    "noTourBookings": "Noch keine Tour-Buchungen.",
+    "noTransportBookings": "Noch keine Transport-Buchungen.",
+    "exploreTours": "Touren Entdecken",
+    "date": "Datum: {{date}}",
+    "guests": "Gäste: {{count}}",
+    "total": "Gesamt: ${{amount}}",
+    "payNow": "Jetzt Bezahlen",
+    "cancel": "Stornieren",
+    "cancelConfirm": "Bist du sicher, dass du diese Buchung stornieren möchtest?",
+    "yourComments": "Deine Kommentare",
+    "adminNotes": "Admin-Notizen",
+    "status": {
+      "pending": "Prüfung Ausstehend",
+      "approved": "Genehmigt - Zahlungsbereit",
+      "confirmed": "Bestätigt",
+      "rejected": "Abgelehnt",
+      "cancelled": "Storniert"
+    }
+  },
+  "login": {
+    "title": "Willkommen Zurück",
+    "subtitle": "Melde dich an, um dein nächstes Abenteuer zu buchen",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "submitting": "Anmeldung...",
+    "noAccount": "Noch kein Konto?",
+    "signUp": "Registrieren"
+  },
+  "register": {
+    "title": "Konto Erstellen",
+    "subtitle": "Registriere dich, um Touren in Vietnam zu buchen",
+    "name": "Vollständiger Name",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "submit": "Konto Erstellen",
+    "submitting": "Konto wird erstellt...",
+    "hasAccount": "Bereits ein Konto?",
+    "signIn": "Anmelden",
+    "passwordMin": "Passwort muss mindestens 6 Zeichen haben"
+  },
+  "payment": {
+    "title": "Zahlung Abschließen",
+    "loading": "Zahlung wird geladen...",
+    "noStripeTitle": "Stripe Nicht Konfiguriert",
+    "noStripeDesc": "Um Zahlungen zu aktivieren, füge deine Stripe-Schlüssel zur .env-Datei hinzu. Deine Buchung wurde genehmigt und ist zahlungsbereit.",
+    "viewBookings": "Meine Buchungen",
+    "successTitle": "Zahlung Erfolgreich!",
+    "successDesc": "Deine Tour wurde bestätigt. Mach dich bereit für ein fantastisches Abenteuer in Vietnam!",
+    "payNow": "Jetzt Bezahlen",
+    "processing": "Verarbeitung...",
+    "paymentFailed": "Zahlung fehlgeschlagen"
+  },
+  "admin": {
+    "title": "Buchungen Verwalten",
+    "noBookings": "Keine Buchungen gefunden",
+    "customer": "Kunde",
+    "customerComments": "Kundenkommentare",
+    "notesPlaceholder": "Notizen hinzufügen (optional)...",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "bookingsSection": "Alle Buchungen",
+    "stats": {
+      "confirmedRevenue": "Bestätigter Umsatz",
+      "pendingRevenue": "Ausstehender Umsatz",
+      "pendingBookings": "Prüfung Ausstehend",
+      "upcomingTours": "Kommende Touren",
+      "customers": "Kunden",
+      "confirmed": "Bestätigt",
+      "popularTours": "Beliebteste Touren",
+      "bookingsLabel": "Buchungen"
+    },
+    "filter": {
+      "all": "Alle",
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "confirmed": "Bestätigt",
+      "rejected": "Abgelehnt",
+      "cancelled": "Storniert"
+    }
+  },
+  "transport": {
+    "heroTitle": "Transport",
+    "heroSubtitle": "Komfortable Transfers zwischen Vietnams Top-Zielen",
+    "routes": "Verfügbare Routen",
+    "perPerson": "/ Person",
+    "travelDate": "Reisedatum",
+    "passengers": "Passagiere",
+    "passengersCount": "{{count}} Passagiere",
+    "pickup": "Abholort",
+    "pickupPlaceholder": "Hotelname oder Adresse...",
+    "commentsPlaceholder": "Ankunftszeit, besondere Wünsche...",
+    "bookTransport": "Transport Buchen",
+    "selectRoute": "Wähle eine Route zum Buchen"
+  },
+  "whatsapp": {
+    "defaultMessage": "Hallo! Ich interessiere mich für eine Tour in Vietnam. Können Sie mir helfen?"
+  }
+}

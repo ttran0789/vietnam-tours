@@ -1,0 +1,149 @@
+{
+  "nav": {
+    "logo": "Du Lịch Việt Nam",
+    "tours": "Tour",
+    "myBookings": "Đặt Chỗ Của Tôi",
+    "greeting": "Xin chào, {{name}}",
+    "logout": "Đăng Xuất",
+    "login": "Đăng Nhập",
+    "signUp": "Đăng Ký",
+    "admin": "Quản Trị",
+    "transport": "Vận Chuyển"
+  },
+  "home": {
+    "heroTitle": "Khám Phá Việt Nam",
+    "heroSubtitle": "Những cuộc phiêu lưu khó quên qua những cảnh quan đẹp nhất Đông Nam Á",
+    "popularTours": "Tour Phổ Biến",
+    "loadingTours": "Đang tải tour...",
+    "maxPeople": "Tối đa {{count}} người",
+    "perPerson": "/ người"
+  },
+  "tour": {
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy tour",
+    "highlights": "Điểm Nổi Bật",
+    "itinerary": "Lịch Trình",
+    "day": "Ngày {{number}}",
+    "included": "Bao Gồm",
+    "notIncluded": "Không Bao Gồm",
+    "maxPeople": "Tối đa {{count}} người",
+    "startDate": "Ngày Bắt Đầu",
+    "numGuests": "Số Khách",
+    "guest": "{{count}} khách",
+    "guests": "{{count}} khách",
+    "total": "Tổng Cộng",
+    "bookNow": "Đặt Ngay",
+    "submitRequest": "Gửi Yêu Cầu Đặt Tour",
+    "booking": "Đang gửi...",
+    "loginToBook": "Đăng Nhập Để Đặt",
+    "selectDate": "Vui lòng chọn ngày bắt đầu",
+    "perPerson": "/ người",
+    "comments": "Ghi Chú / Yêu Cầu",
+    "commentsPlaceholder": "Hạn chế ăn uống, sở thích nhóm du lịch, yêu cầu đặc biệt...",
+    "bookingNote": "Chưa cần thanh toán. Chúng tôi sẽ xem xét yêu cầu và phản hồi bạn.",
+    "bookingSubmitted": "Đã Gửi Yêu Cầu!",
+    "bookingSubmittedDesc": "Chúng tôi sẽ xem xét đặt chỗ và thông báo khi được duyệt. Sau đó bạn có thể thanh toán."
+  },
+  "bookings": {
+    "title": "Đặt Chỗ Của Tôi",
+    "noBookings": "Chưa có đặt chỗ nào",
+    "noBookingsDesc": "Khám phá các tour và đặt chuyến phiêu lưu Việt Nam tiếp theo!",
+    "noTourBookings": "Chưa có đặt tour nào.",
+    "noTransportBookings": "Chưa có đặt vận chuyển nào.",
+    "exploreTours": "Khám Phá Tour",
+    "date": "Ngày: {{date}}",
+    "guests": "Khách: {{count}}",
+    "total": "Tổng: ${{amount}}",
+    "payNow": "Thanh Toán",
+    "cancel": "Hủy",
+    "cancelConfirm": "Bạn có chắc muốn hủy đặt chỗ này không?",
+    "yourComments": "Ghi chú của bạn",
+    "adminNotes": "Ghi chú quản trị",
+    "status": {
+      "pending": "Đang Chờ Duyệt",
+      "approved": "Đã Duyệt - Sẵn Sàng Thanh Toán",
+      "confirmed": "Đã Xác Nhận",
+      "rejected": "Đã Từ Chối",
+      "cancelled": "Đã Hủy"
+    }
+  },
+  "login": {
+    "title": "Chào Mừng Trở Lại",
+    "subtitle": "Đăng nhập để đặt chuyến phiêu lưu tiếp theo",
+    "email": "Email",
+    "password": "Mật Khẩu",
+    "submit": "Đăng Nhập",
+    "submitting": "Đang đăng nhập...",
+    "noAccount": "Chưa có tài khoản?",
+    "signUp": "Đăng ký"
+  },
+  "register": {
+    "title": "Tạo Tài Khoản",
+    "subtitle": "Đăng ký để bắt đầu đặt tour Việt Nam",
+    "name": "Họ và Tên",
+    "email": "Email",
+    "password": "Mật Khẩu",
+    "submit": "Tạo Tài Khoản",
+    "submitting": "Đang tạo tài khoản...",
+    "hasAccount": "Đã có tài khoản?",
+    "signIn": "Đăng nhập",
+    "passwordMin": "Mật khẩu phải có ít nhất 6 ký tự"
+  },
+  "payment": {
+    "title": "Hoàn Tất Thanh Toán",
+    "loading": "Đang tải thanh toán...",
+    "noStripeTitle": "Stripe Chưa Được Cấu Hình",
+    "noStripeDesc": "Để kích hoạt thanh toán, thêm khóa Stripe vào file .env của backend. Đặt chỗ đã được duyệt và sẵn sàng thanh toán.",
+    "viewBookings": "Xem Đặt Chỗ",
+    "successTitle": "Thanh Toán Thành Công!",
+    "successDesc": "Tour của bạn đã được xác nhận. Sẵn sàng cho cuộc phiêu lưu tuyệt vời tại Việt Nam!",
+    "payNow": "Thanh Toán",
+    "processing": "Đang xử lý...",
+    "paymentFailed": "Thanh toán thất bại"
+  },
+  "admin": {
+    "title": "Quản Lý Đặt Chỗ",
+    "noBookings": "Không có đặt chỗ nào",
+    "customer": "Khách hàng",
+    "customerComments": "Ghi chú khách hàng",
+    "notesPlaceholder": "Thêm ghi chú (tùy chọn)...",
+    "approve": "Duyệt",
+    "reject": "Từ Chối",
+    "bookingsSection": "Tất Cả Đặt Chỗ",
+    "stats": {
+      "confirmedRevenue": "Doanh Thu Xác Nhận",
+      "pendingRevenue": "Doanh Thu Chờ Duyệt",
+      "pendingBookings": "Chờ Duyệt",
+      "upcomingTours": "Tour Sắp Tới",
+      "customers": "Khách Hàng",
+      "confirmed": "Đã Xác Nhận",
+      "popularTours": "Tour Phổ Biến Nhất",
+      "bookingsLabel": "đặt chỗ"
+    },
+    "filter": {
+      "all": "Tất Cả",
+      "pending": "Đang Chờ",
+      "approved": "Đã Duyệt",
+      "confirmed": "Đã Xác Nhận",
+      "rejected": "Đã Từ Chối",
+      "cancelled": "Đã Hủy"
+    }
+  },
+  "transport": {
+    "heroTitle": "Vận Chuyển",
+    "heroSubtitle": "Di chuyển thoải mái giữa các điểm đến hàng đầu Việt Nam",
+    "routes": "Tuyến Đường Có Sẵn",
+    "perPerson": "/ người",
+    "travelDate": "Ngày Di Chuyển",
+    "passengers": "Số Hành Khách",
+    "passengersCount": "{{count}} hành khách",
+    "pickup": "Địa Điểm Đón",
+    "pickupPlaceholder": "Tên khách sạn hoặc địa chỉ...",
+    "commentsPlaceholder": "Giờ đến sân bay, yêu cầu đặc biệt...",
+    "bookTransport": "Đặt Vận Chuyển",
+    "selectRoute": "Chọn tuyến đường để đặt"
+  },
+  "whatsapp": {
+    "defaultMessage": "Xin chào! Tôi muốn đặt tour du lịch Việt Nam. Bạn có thể giúp tôi không?"
+  }
+}

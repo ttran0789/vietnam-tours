@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: vntours-backend
+    restart: unless-stopped
+    ports:
+      - "8090:8000"
+    volumes:
+      - vntours-data:/app
+    env_file:
+      - ./backend/.env.production
+    networks:
+      - my-network
+
+  frontend:
+    build: ./frontend
+    container_name: vntours-frontend
+    restart: unless-stopped
+    ports:
+      - "3003:80"
+    networks:
+      - my-network
+
+volumes:
+  vntours-data:
+
+networks:
+  my-network:
+    external: true
