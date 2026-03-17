@@ -126,6 +126,10 @@
     "saveProfile": "Lưu Hồ Sơ",
     "saved": "Hồ sơ đã được cập nhật!"
   },
+  "confirmed": {
+    "title": "Đã Gửi Yêu Cầu Đặt Chỗ!",
+    "desc": "Cảm ơn bạn! Chúng tôi đã nhận yêu cầu và sẽ xem xét sớm. Bạn sẽ nhận email khi được duyệt và có thể thanh toán."
+  },
   "payment": {
     "title": "Hoàn Tất Thanh Toán",
     "loading": "Đang tải thanh toán...",

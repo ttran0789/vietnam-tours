@@ -126,6 +126,10 @@
     "saveProfile": "Guardar Perfil",
     "saved": "¡Perfil actualizado exitosamente!"
   },
+  "confirmed": {
+    "title": "¡Solicitud de Reserva Enviada!",
+    "desc": "¡Gracias! Hemos recibido tu solicitud y la revisaremos pronto. Recibirás un correo cuando sea aprobada para proceder al pago."
+  },
   "payment": {
     "title": "Completar Pago",
     "loading": "Cargando pago...",

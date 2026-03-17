@@ -56,7 +56,7 @@ export default function TourDetail() {
       if (res.status === 'approved') {
         navigate(`/payment/${res.id}`)
       } else {
-        setSuccess(true)
+        navigate('/booking-confirmed')
       }
     } catch (e: any) {
       setError(e.message)

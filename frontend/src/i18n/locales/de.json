@@ -126,6 +126,10 @@
     "saveProfile": "Profil Speichern",
     "saved": "Profil erfolgreich aktualisiert!"
   },
+  "confirmed": {
+    "title": "Buchungsanfrage Gesendet!",
+    "desc": "Danke! Wir haben deine Anfrage erhalten und werden sie in Kürze prüfen. Du erhältst eine E-Mail nach Genehmigung und kannst dann bezahlen."
+  },
   "payment": {
     "title": "Zahlung Abschließen",
     "loading": "Zahlung wird geladen...",

@@ -792,6 +792,41 @@ a { color: var(--primary); text-decoration: none; }
   background: #dc2626;
 }
 
+/* ── Booking Confirmed ────────────────────────── */
+.confirmed-page {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.confirmed-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+.confirmed-page h1 {
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+.confirmed-page p {
+  color: var(--text-light);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+.confirmed-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
 /* ── Profile ──────────────────────────────────── */
 .profile-layout {
   display: grid;

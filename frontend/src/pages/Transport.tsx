@@ -45,7 +45,7 @@ export default function Transport() {
       if (res.status === 'approved') {
         navigate(`/payment/${res.id}?type=transport`)
       } else {
-        setSuccess(true)
+        navigate('/booking-confirmed')
       }
     } catch (e: any) {
       setError(e.message)

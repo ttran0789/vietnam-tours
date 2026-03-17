@@ -126,6 +126,10 @@
     "saveProfile": "Save Profile",
     "saved": "Profile updated successfully!"
   },
+  "confirmed": {
+    "title": "Booking Request Submitted!",
+    "desc": "Thank you! We've received your booking request and will review it shortly. You'll receive an email once it's approved, and can then proceed to payment."
+  },
   "payment": {
     "title": "Complete Payment",
     "loading": "Loading payment...",
