@@ -8,7 +8,8 @@
     "login": "Login",
     "signUp": "Sign Up",
     "admin": "Admin",
-    "transport": "Transportation"
+    "transport": "Transportation",
+    "about": "About"
   },
   "home": {
     "heroTitle": "Discover Vietnam",
@@ -143,6 +144,34 @@
     "commentsPlaceholder": "Flight arrival time, special requests...",
     "bookTransport": "Book Transport",
     "selectRoute": "Select a route to book"
+  },
+  "about": {
+    "heroTitle": "About Us",
+    "heroSubtitle": "Your trusted guide to authentic Vietnam adventures",
+    "storyTitle": "Our Story",
+    "storyP1": "Travel VN Tours was founded by a Vietnamese-American who has spent years showing friends, family, and fellow travelers the real beauty of Vietnam — beyond the tourist traps and overpriced packages.",
+    "storyP2": "Growing up between two cultures, we understand what international travelers need: honest pricing, safe transportation, authentic experiences, and someone who actually knows the roads, the villages, and the hidden gems. We've personally ridden every kilometer of the Ha Giang Loop, stayed in the homestays we recommend, and eaten at the roadside spots we take you to.",
+    "storyP3": "Our mission is simple: help you experience Vietnam the way it should be experienced — safely, affordably, and without getting ripped off. Whether you're a solo backpacker or traveling with family, we'll make sure you see the best of northern Vietnam with local guides who genuinely care about your experience.",
+    "whyTitle": "Why Travel With Us",
+    "why1Title": "Local Expertise",
+    "why1Desc": "Vietnamese-American team with deep local knowledge. We know the roads, the culture, and the best-kept secrets.",
+    "why2Title": "Fair & Transparent Pricing",
+    "why2Desc": "No hidden fees, no tourist markups. What you see is what you pay. We believe in honest business.",
+    "why3Title": "Safety First",
+    "why3Desc": "Quality bikes, experienced guides, proper safety gear, and full insurance. Your safety is never compromised.",
+    "why4Title": "Authentic Experiences",
+    "why4Desc": "Real homestays with ethnic minority families, local food, and off-the-beaten-path routes — not cookie-cutter tours.",
+    "ctaTitle": "Ready for Your Vietnam Adventure?",
+    "ctaDesc": "Browse our tours or get in touch — we're happy to help you plan the perfect trip.",
+    "ctaTours": "Browse Tours",
+    "ctaTransport": "Transportation",
+    "contactTitle": "Get In Touch",
+    "email": "Email",
+    "phone": "Phone",
+    "chatWhatsApp": "Chat with us",
+    "hours": "Response Hours",
+    "hoursDetail": "We typically respond within a few hours. For urgent requests, WhatsApp is fastest.",
+    "responseTime": "Average response time: under 2 hours"
   },
   "reviews": {
     "title": "What Our Travelers Say"

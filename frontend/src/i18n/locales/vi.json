@@ -8,7 +8,8 @@
     "login": "Đăng Nhập",
     "signUp": "Đăng Ký",
     "admin": "Quản Trị",
-    "transport": "Vận Chuyển"
+    "transport": "Vận Chuyển",
+    "about": "Giới Thiệu"
   },
   "home": {
     "heroTitle": "Khám Phá Việt Nam",
@@ -143,6 +144,34 @@
     "commentsPlaceholder": "Giờ đến sân bay, yêu cầu đặc biệt...",
     "bookTransport": "Đặt Vận Chuyển",
     "selectRoute": "Chọn tuyến đường để đặt"
+  },
+  "about": {
+    "heroTitle": "Về Chúng Tôi",
+    "heroSubtitle": "Đối tác đáng tin cậy cho những chuyến phiêu lưu Việt Nam đích thực",
+    "storyTitle": "Câu Chuyện Của Chúng Tôi",
+    "storyP1": "Travel VN Tours được thành lập bởi một người Mỹ gốc Việt đã dành nhiều năm giới thiệu vẻ đẹp thực sự của Việt Nam cho bạn bè, gia đình và du khách — vượt xa những bẫy du lịch và gói tour đắt đỏ.",
+    "storyP2": "Lớn lên giữa hai nền văn hóa, chúng tôi hiểu du khách quốc tế cần gì: giá cả trung thực, vận chuyển an toàn, trải nghiệm chân thực, và người thực sự biết đường, biết làng, biết những viên ngọc ẩn giấu. Chúng tôi đã tự mình đi qua từng cây số của Vòng Lặp Hà Giang.",
+    "storyP3": "Sứ mệnh của chúng tôi rất đơn giản: giúp bạn trải nghiệm Việt Nam đúng cách — an toàn, hợp lý, và không bị chặt chém. Dù bạn là người đi bụi hay du lịch cùng gia đình, chúng tôi sẽ đảm bảo bạn thấy được vẻ đẹp nhất của miền Bắc Việt Nam.",
+    "whyTitle": "Tại Sao Chọn Chúng Tôi",
+    "why1Title": "Chuyên Gia Địa Phương",
+    "why1Desc": "Đội ngũ Việt kiều với kiến thức địa phương sâu sắc. Chúng tôi biết đường, biết văn hóa và những bí mật tốt nhất.",
+    "why2Title": "Giá Cả Minh Bạch",
+    "why2Desc": "Không phí ẩn, không tăng giá du khách. Bạn thấy gì là trả đó. Chúng tôi tin vào kinh doanh trung thực.",
+    "why3Title": "An Toàn Là Trên Hết",
+    "why3Desc": "Xe chất lượng, hướng dẫn viên kinh nghiệm, đồ bảo hộ đầy đủ và bảo hiểm toàn diện.",
+    "why4Title": "Trải Nghiệm Đích Thực",
+    "why4Desc": "Homestay thực sự với gia đình dân tộc thiểu số, ẩm thực địa phương và những cung đường chưa ai biết.",
+    "ctaTitle": "Sẵn Sàng Cho Chuyến Phiêu Lưu?",
+    "ctaDesc": "Khám phá các tour hoặc liên hệ — chúng tôi sẵn lòng giúp bạn lên kế hoạch.",
+    "ctaTours": "Xem Tour",
+    "ctaTransport": "Vận Chuyển",
+    "contactTitle": "Liên Hệ",
+    "email": "Email",
+    "phone": "Điện Thoại",
+    "chatWhatsApp": "Chat với chúng tôi",
+    "hours": "Giờ Phản Hồi",
+    "hoursDetail": "Chúng tôi thường phản hồi trong vài giờ. Cho yêu cầu gấp, WhatsApp là nhanh nhất.",
+    "responseTime": "Thời gian phản hồi trung bình: dưới 2 giờ"
   },
   "reviews": {
     "title": "Khách Hàng Nói Gì"

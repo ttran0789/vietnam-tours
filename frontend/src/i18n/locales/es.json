@@ -8,7 +8,8 @@
     "login": "Iniciar Sesión",
     "signUp": "Registrarse",
     "admin": "Admin",
-    "transport": "Transporte"
+    "transport": "Transporte",
+    "about": "Nosotros"
   },
   "home": {
     "heroTitle": "Descubre Vietnam",
@@ -143,6 +144,34 @@
     "commentsPlaceholder": "Hora de llegada del vuelo, solicitudes especiales...",
     "bookTransport": "Reservar Transporte",
     "selectRoute": "Selecciona una ruta para reservar"
+  },
+  "about": {
+    "heroTitle": "Sobre Nosotros",
+    "heroSubtitle": "Tu guía de confianza para aventuras auténticas en Vietnam",
+    "storyTitle": "Nuestra Historia",
+    "storyP1": "Travel VN Tours fue fundada por un vietnamita-americano que ha pasado años mostrando la verdadera belleza de Vietnam a amigos, familia y viajeros — más allá de las trampas turísticas y los paquetes inflados.",
+    "storyP2": "Creciendo entre dos culturas, entendemos lo que los viajeros internacionales necesitan: precios honestos, transporte seguro, experiencias auténticas y alguien que realmente conoce los caminos, los pueblos y las joyas escondidas.",
+    "storyP3": "Nuestra misión es simple: ayudarte a experimentar Vietnam como debe ser — de forma segura, asequible y sin que te estafen. Ya seas mochilero o viajes en familia, te aseguraremos la mejor experiencia del norte de Vietnam.",
+    "whyTitle": "Por Qué Viajar Con Nosotros",
+    "why1Title": "Experiencia Local",
+    "why1Desc": "Equipo vietnamita-americano con profundo conocimiento local. Conocemos los caminos, la cultura y los mejores secretos.",
+    "why2Title": "Precios Justos y Transparentes",
+    "why2Desc": "Sin cargos ocultos, sin precios inflados. Lo que ves es lo que pagas.",
+    "why3Title": "Seguridad Primero",
+    "why3Desc": "Motos de calidad, guías experimentados, equipo de seguridad y seguro completo.",
+    "why4Title": "Experiencias Auténticas",
+    "why4Desc": "Homestays reales con familias de minorías étnicas, comida local y rutas fuera de lo común.",
+    "ctaTitle": "¿Listo Para Tu Aventura?",
+    "ctaDesc": "Explora nuestros tours o contáctanos — estamos encantados de ayudarte a planificar.",
+    "ctaTours": "Ver Tours",
+    "ctaTransport": "Transporte",
+    "contactTitle": "Contáctanos",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "chatWhatsApp": "Escríbenos",
+    "hours": "Horario de Respuesta",
+    "hoursDetail": "Normalmente respondemos en pocas horas. Para urgencias, WhatsApp es lo más rápido.",
+    "responseTime": "Tiempo de respuesta promedio: menos de 2 horas"
   },
   "reviews": {
     "title": "Lo Que Dicen Nuestros Viajeros"

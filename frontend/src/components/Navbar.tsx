@@ -39,6 +39,7 @@ export default function Navbar() {
         <div className={`nav-links ${menuOpen ? 'nav-links-open' : ''}`}>
           <NavLink to="/">{t('nav.tours')}</NavLink>
           <NavLink to="/transport">{t('nav.transport')}</NavLink>
+          <NavLink to="/about">{t('nav.about')}</NavLink>
           {user ? (
             <>
               <NavLink to="/my-bookings">{t('nav.myBookings')}</NavLink>

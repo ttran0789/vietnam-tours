@@ -9,6 +9,7 @@ import Register from './pages/Register'
 import PaymentPage from './pages/PaymentPage'
 import AdminBookings from './pages/AdminBookings'
 import Transport from './pages/Transport'
+import About from './pages/About'
 import WhatsAppButton from './components/WhatsAppButton'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/tours/:slug" element={<TourDetail />} />
           <Route path="/transport" element={<Transport />} />
+          <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
