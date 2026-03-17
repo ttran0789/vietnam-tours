@@ -1,0 +1,16 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="400" rx="40" fill="white" />
+
+  <!-- Mountain + Sun Icon (centered, larger) -->
+  <path d="M60 300L140 100L180 180L220 80L340 300H60Z" fill="#0f766e" opacity="0.12" />
+  <path d="M60 300L140 120L180 190L220 100L340 300" stroke="#0f766e" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" fill="none" />
+  <circle cx="300" cy="80" r="28" fill="#f59e0b" />
+  <path d="M170 300C170 300 185 230 200 230C215 230 230 300 230 300" stroke="#0f766e" stroke-width="6" stroke-linecap="round" fill="none" />
+  <path d="M80 270C100 260 115 264 145 254" stroke="#0f766e" stroke-width="4" stroke-linecap="round" opacity="0.35" />
+  <path d="M250 258C275 248 290 252 320 242" stroke="#0f766e" stroke-width="4" stroke-linecap="round" opacity="0.35" />
+
+  <!-- Text below -->
+  <text x="200" y="348" text-anchor="middle" font-family="Lora, Georgia, serif" font-size="36" font-weight="700" fill="#0f766e" letter-spacing="-0.5">Travel VN Tours</text>
+  <text x="200" y="380" text-anchor="middle" font-family="Lora, Georgia, serif" font-size="16" fill="#64748b" letter-spacing="3">AUTHENTIC VIETNAM ADVENTURES</text>
+</svg>
