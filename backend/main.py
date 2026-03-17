@@ -40,6 +40,20 @@ app.add_middleware(
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 
 
+from datetime import datetime, timezone, timedelta
+
+VIETNAM_TZ = timezone(timedelta(hours=7))
+
+def is_instant_booking(date_str: str) -> bool:
+    """Auto-approve if booking date is 3+ days from now in Vietnam time."""
+    try:
+        booking_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        now_vietnam = datetime.now(VIETNAM_TZ).date()
+        return (booking_date - now_vietnam).days >= 3
+    except ValueError:
+        return False
+
+
 def require_admin(user: User = Depends(get_current_user)) -> User:
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
@@ -105,20 +119,24 @@ def create_booking(
     if not tour:
         raise HTTPException(status_code=404, detail="Tour not found")
     total_price = tour.price * data.num_guests
+    auto_approve = is_instant_booking(data.start_date)
     booking = Booking(
         user_id=user.id,
         tour_id=data.tour_id,
         start_date=data.start_date,
         num_guests=data.num_guests,
         total_price=total_price,
-        status=BookingStatus.PENDING,
+        status=BookingStatus.APPROVED if auto_approve else BookingStatus.PENDING,
         comments=data.comments,
     )
     db.add(booking)
     db.commit()
     db.refresh(booking)
 
-    send_booking_submitted(user.email, user.name, tour.name, data.start_date, data.num_guests, total_price)
+    if auto_approve:
+        send_booking_approved(user.email, user.name, tour.name, booking.id, "Instant booking - approved automatically")
+    else:
+        send_booking_submitted(user.email, user.name, tour.name, data.start_date, data.num_guests, total_price)
     send_admin_new_booking(user.name, user.email, tour.name, data.start_date, data.num_guests, total_price, data.comments)
 
     return booking
@@ -303,13 +321,14 @@ def create_transport_booking(
     if not route:
         raise HTTPException(status_code=404, detail="Route not found")
     total_price = route.price * data.num_passengers
+    auto_approve = is_instant_booking(data.travel_date)
     tb = TransportBooking(
         user_id=user.id,
         route_id=data.route_id,
         travel_date=data.travel_date,
         num_passengers=data.num_passengers,
         total_price=total_price,
-        status=BookingStatus.PENDING,
+        status=BookingStatus.APPROVED if auto_approve else BookingStatus.PENDING,
         comments=data.comments,
         pickup_location=data.pickup_location,
     )
@@ -318,7 +337,10 @@ def create_transport_booking(
     db.refresh(tb)
 
     route_name = f"{route.origin} → {route.destination}"
-    send_booking_submitted(user.email, user.name, f"Transport: {route_name}", data.travel_date, data.num_passengers, total_price)
+    if auto_approve:
+        send_booking_approved(user.email, user.name, f"Transport: {route_name}", tb.id, "Instant booking - approved automatically")
+    else:
+        send_booking_submitted(user.email, user.name, f"Transport: {route_name}", data.travel_date, data.num_passengers, total_price)
     send_admin_new_booking(user.name, user.email, f"Transport: {route_name}", data.travel_date, data.num_passengers, total_price, data.comments)
 
     return tb

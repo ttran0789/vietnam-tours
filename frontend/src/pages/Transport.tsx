@@ -39,8 +39,12 @@ export default function Transport() {
     setSubmitting(true)
     setError('')
     try {
-      await api.createTransportBooking(selectedRoute.id, travelDate, numPassengers, comments, pickup)
-      setSuccess(true)
+      const res: any = await api.createTransportBooking(selectedRoute.id, travelDate, numPassengers, comments, pickup)
+      if (res.status === 'approved') {
+        navigate(`/payment/${res.id}?type=transport`)
+      } else {
+        setSuccess(true)
+      }
     } catch (e: any) {
       setError(e.message)
     } finally {

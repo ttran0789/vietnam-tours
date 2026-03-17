@@ -50,8 +50,12 @@ export default function TourDetail() {
     setBooking(true)
     setError('')
     try {
-      await api.createBooking(tour!.id, startDate, numGuests, comments)
-      setSuccess(true)
+      const res: any = await api.createBooking(tour!.id, startDate, numGuests, comments)
+      if (res.status === 'approved') {
+        navigate(`/payment/${res.id}`)
+      } else {
+        setSuccess(true)
+      }
     } catch (e: any) {
       setError(e.message)
     } finally {
