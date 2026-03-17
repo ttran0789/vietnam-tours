@@ -1,44 +1,60 @@
-import smtplib
 import os
 import logging
+import base64
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from threading import Thread
 
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+
 logger = logging.getLogger(__name__)
 
-SMTP_HOST = os.getenv("SMTP_HOST", "")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER = os.getenv("SMTP_USER", "")
-SMTP_PASS = os.getenv("SMTP_PASS", "")
-FROM_EMAIL = os.getenv("FROM_EMAIL", "noreply@vietnamtours.com")
+GMAIL_CLIENT_ID = os.getenv("GMAIL_CLIENT_ID", "")
+GMAIL_CLIENT_SECRET = os.getenv("GMAIL_CLIENT_SECRET", "")
+GMAIL_REFRESH_TOKEN = os.getenv("GMAIL_REFRESH_TOKEN", "")
+FROM_EMAIL = os.getenv("FROM_EMAIL", "bookings@travelvntours.com")
 FROM_NAME = os.getenv("FROM_NAME", "Travel VN Tours")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@vietnamtours.com")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "bookings@travelvntours.com")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 
 def _is_configured() -> bool:
-    return bool(SMTP_HOST and SMTP_USER and SMTP_PASS)
+    return bool(GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET and GMAIL_REFRESH_TOKEN)
+
+
+def _get_gmail_service():
+    creds = Credentials(
+        token=None,
+        refresh_token=GMAIL_REFRESH_TOKEN,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=GMAIL_CLIENT_ID,
+        client_secret=GMAIL_CLIENT_SECRET,
+        scopes=["https://www.googleapis.com/auth/gmail.send"],
+    )
+    return build("gmail", "v1", credentials=creds)
 
 
 def _send_email(to_email: str, subject: str, html_body: str):
-    """Send email in background thread. Fails silently with logging."""
+    """Send email via Gmail API in background thread. Fails silently with logging."""
     if not _is_configured():
-        logger.info(f"Email not configured. Would send to {to_email}: {subject}")
+        logger.info(f"Gmail API not configured. Would send to {to_email}: {subject}")
         return
 
     def _do_send():
         try:
+            service = _get_gmail_service()
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
             msg["From"] = f"{FROM_NAME} <{FROM_EMAIL}>"
             msg["To"] = to_email
             msg.attach(MIMEText(html_body, "html"))
 
-            with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-                server.starttls()
-                server.login(SMTP_USER, SMTP_PASS)
-                server.sendmail(FROM_EMAIL, to_email, msg.as_string())
+            raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+            service.users().messages().send(
+                userId="me",
+                body={"raw": raw},
+            ).execute()
             logger.info(f"Email sent to {to_email}: {subject}")
         except Exception as e:
             logger.error(f"Failed to send email to {to_email}: {e}")
