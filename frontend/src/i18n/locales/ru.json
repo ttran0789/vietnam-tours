@@ -26,6 +26,7 @@
     "day": "День {{number}}",
     "included": "Что Включено",
     "notIncluded": "Не Включено",
+    "photos": "Фотографии",
     "maxPeople": "Макс {{count}} человек",
     "startDate": "Дата Начала",
     "numGuests": "Количество Гостей",

@@ -5,6 +5,8 @@ import { api } from '../api'
 import { Tour, Review } from '../types'
 import { useAuth } from '../context/AuthContext'
 import ReviewCard from '../components/ReviewCard'
+import PhotoGallery from '../components/PhotoGallery'
+import { TOUR_IMAGES, TOUR_HERO_IMAGES } from '../data/tourImages'
 
 export default function TourDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -64,153 +66,180 @@ export default function TourDetail() {
   const itinerary = tour.itinerary ? JSON.parse(tour.itinerary) : []
   const included = tour.included ? JSON.parse(tour.included) : []
   const notIncluded = tour.not_included ? JSON.parse(tour.not_included) : []
+  const galleryImages = TOUR_IMAGES[tour.slug] || []
+  const heroImage = TOUR_HERO_IMAGES[tour.slug]
 
   return (
-    <div className="container">
-      <div className="tour-detail">
-        <div className="tour-detail-main">
-          <div className="tour-detail-header">
-            <span className="tour-card-location">{tour.location}</span>
+    <div>
+      {heroImage && (
+        <div className="tour-hero">
+          <img src={heroImage} alt={tour.name} />
+          <div className="tour-hero-overlay">
             <h1>{tour.name}</h1>
-            <div className="tour-meta">
+            <div className="tour-hero-meta">
+              <span>{tour.location}</span>
               <span>{tour.duration}</span>
               <span>{tour.difficulty}</span>
-              <span>{t('tour.maxPeople', { count: tour.max_group_size })}</span>
             </div>
           </div>
-
-          <p className="tour-description">{tour.description}</p>
-
-          {highlights.length > 0 && (
-            <div className="tour-section">
-              <h2>{t('tour.highlights')}</h2>
-              <ul className="highlight-list">
-                {highlights.map((h: string, i: number) => (
-                  <li key={i}>{h}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {itinerary.length > 0 && (
-            <div className="tour-section">
-              <h2>{t('tour.itinerary')}</h2>
-              <div className="itinerary">
-                {itinerary.map((day: any) => (
-                  <div key={day.day} className="itinerary-day">
-                    <div className="itinerary-day-header">
-                      <span className="day-number">{t('tour.day', { number: day.day })}</span>
-                      <h3>{day.title}</h3>
-                    </div>
-                    <p>{day.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="tour-includes-grid">
-            {included.length > 0 && (
-              <div className="tour-section">
-                <h2>{t('tour.included')}</h2>
-                <ul className="include-list included">
-                  {included.map((item: string, i: number) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {notIncluded.length > 0 && (
-              <div className="tour-section">
-                <h2>{t('tour.notIncluded')}</h2>
-                <ul className="include-list not-included">
-                  {notIncluded.map((item: string, i: number) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
-          {reviews.length > 0 && (
-            <div className="tour-section">
-              <h2>{t('reviews.title')} ({reviews.length})</h2>
-              <div className="tour-reviews">
-                {reviews.map(review => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+      )}
 
-        <aside className="tour-detail-sidebar">
-          <div className="booking-card">
-            <div className="booking-price">
-              <span className="price-amount">${tour.price}</span>
-              <span className="price-unit">{t('tour.perPerson')}</span>
+      <div className="container">
+        <div className="tour-detail">
+          <div className="tour-detail-main">
+            {!heroImage && (
+              <div className="tour-detail-header">
+                <span className="tour-card-location">{tour.location}</span>
+                <h1>{tour.name}</h1>
+                <div className="tour-meta">
+                  <span>{tour.duration}</span>
+                  <span>{tour.difficulty}</span>
+                  <span>{t('tour.maxPeople', { count: tour.max_group_size })}</span>
+                </div>
+              </div>
+            )}
+
+            <p className="tour-description">{tour.description}</p>
+
+            {galleryImages.length > 0 && (
+              <div className="tour-section">
+                <h2>{t('tour.photos')}</h2>
+                <PhotoGallery images={galleryImages} />
+              </div>
+            )}
+
+            {highlights.length > 0 && (
+              <div className="tour-section">
+                <h2>{t('tour.highlights')}</h2>
+                <ul className="highlight-list">
+                  {highlights.map((h: string, i: number) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {itinerary.length > 0 && (
+              <div className="tour-section">
+                <h2>{t('tour.itinerary')}</h2>
+                <div className="itinerary">
+                  {itinerary.map((day: any) => (
+                    <div key={day.day} className="itinerary-day">
+                      <div className="itinerary-day-header">
+                        <span className="day-number">{t('tour.day', { number: day.day })}</span>
+                        <h3>{day.title}</h3>
+                      </div>
+                      <p>{day.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="tour-includes-grid">
+              {included.length > 0 && (
+                <div className="tour-section">
+                  <h2>{t('tour.included')}</h2>
+                  <ul className="include-list included">
+                    {included.map((item: string, i: number) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {notIncluded.length > 0 && (
+                <div className="tour-section">
+                  <h2>{t('tour.notIncluded')}</h2>
+                  <ul className="include-list not-included">
+                    {notIncluded.map((item: string, i: number) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
-            {success ? (
-              <div className="booking-success">
-                <h3>{t('tour.bookingSubmitted')}</h3>
-                <p>{t('tour.bookingSubmittedDesc')}</p>
-                <button className="btn btn-primary btn-block" onClick={() => navigate('/my-bookings')}>
-                  {t('bookings.title')}
-                </button>
-              </div>
-            ) : (
-              <div className="booking-form">
-                <label>
-                  {t('tour.startDate')}
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={e => setStartDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                </label>
-
-                <label>
-                  {t('tour.numGuests')}
-                  <select value={numGuests} onChange={e => setNumGuests(Number(e.target.value))}>
-                    {Array.from({ length: tour.max_group_size }, (_, i) => i + 1).map(n => (
-                      <option key={n} value={n}>
-                        {n === 1 ? t('tour.guest', { count: n }) : t('tour.guests', { count: n })}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  {t('tour.comments')}
-                  <textarea
-                    value={comments}
-                    onChange={e => setComments(e.target.value)}
-                    placeholder={t('tour.commentsPlaceholder')}
-                    rows={3}
-                  />
-                </label>
-
-                <div className="booking-total">
-                  <span>{t('tour.total')}</span>
-                  <span className="total-amount">${(tour.price * numGuests).toFixed(2)}</span>
+            {reviews.length > 0 && (
+              <div className="tour-section">
+                <h2>{t('reviews.title')} ({reviews.length})</h2>
+                <div className="tour-reviews">
+                  {reviews.map(review => (
+                    <ReviewCard key={review.id} review={review} />
+                  ))}
                 </div>
-
-                {error && <div className="error-message">{error}</div>}
-
-                <button
-                  className="btn btn-primary btn-block"
-                  onClick={handleBook}
-                  disabled={booking}
-                >
-                  {booking ? t('tour.booking') : user ? t('tour.submitRequest') : t('tour.loginToBook')}
-                </button>
-                <p className="booking-note">{t('tour.bookingNote')}</p>
               </div>
             )}
           </div>
-        </aside>
+
+          <aside className="tour-detail-sidebar">
+            <div className="booking-card">
+              <div className="booking-price">
+                <span className="price-amount">${tour.price}</span>
+                <span className="price-unit">{t('tour.perPerson')}</span>
+              </div>
+
+              {success ? (
+                <div className="booking-success">
+                  <h3>{t('tour.bookingSubmitted')}</h3>
+                  <p>{t('tour.bookingSubmittedDesc')}</p>
+                  <button className="btn btn-primary btn-block" onClick={() => navigate('/my-bookings')}>
+                    {t('bookings.title')}
+                  </button>
+                </div>
+              ) : (
+                <div className="booking-form">
+                  <label>
+                    {t('tour.startDate')}
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={e => setStartDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                  </label>
+
+                  <label>
+                    {t('tour.numGuests')}
+                    <select value={numGuests} onChange={e => setNumGuests(Number(e.target.value))}>
+                      {Array.from({ length: tour.max_group_size }, (_, i) => i + 1).map(n => (
+                        <option key={n} value={n}>
+                          {n === 1 ? t('tour.guest', { count: n }) : t('tour.guests', { count: n })}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label>
+                    {t('tour.comments')}
+                    <textarea
+                      value={comments}
+                      onChange={e => setComments(e.target.value)}
+                      placeholder={t('tour.commentsPlaceholder')}
+                      rows={3}
+                    />
+                  </label>
+
+                  <div className="booking-total">
+                    <span>{t('tour.total')}</span>
+                    <span className="total-amount">${(tour.price * numGuests).toFixed(2)}</span>
+                  </div>
+
+                  {error && <div className="error-message">{error}</div>}
+
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={handleBook}
+                    disabled={booking}
+                  >
+                    {booking ? t('tour.booking') : user ? t('tour.submitRequest') : t('tour.loginToBook')}
+                  </button>
+                  <p className="booking-note">{t('tour.bookingNote')}</p>
+                </div>
+              )}
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   )

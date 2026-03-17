@@ -26,6 +26,7 @@
     "day": "Day {{number}}",
     "included": "What's Included",
     "notIncluded": "Not Included",
+    "photos": "Photos",
     "maxPeople": "Max {{count}} people",
     "startDate": "Start Date",
     "numGuests": "Number of Guests",

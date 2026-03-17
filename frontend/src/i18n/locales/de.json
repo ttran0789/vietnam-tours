@@ -26,6 +26,7 @@
     "day": "Tag {{number}}",
     "included": "Inklusivleistungen",
     "notIncluded": "Nicht Inbegriffen",
+    "photos": "Fotos",
     "maxPeople": "Max {{count}} Personen",
     "startDate": "Startdatum",
     "numGuests": "Anzahl der Gäste",

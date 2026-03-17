@@ -26,6 +26,7 @@
     "day": "Ngày {{number}}",
     "included": "Bao Gồm",
     "notIncluded": "Không Bao Gồm",
+    "photos": "Hình Ảnh",
     "maxPeople": "Tối đa {{count}} người",
     "startDate": "Ngày Bắt Đầu",
     "numGuests": "Số Khách",
