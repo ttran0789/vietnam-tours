@@ -21,7 +21,7 @@ export default function Home() {
         data.forEach((tour: Tour) => {
           api.getTourImages(tour.slug).then((imgs: any) => {
             if (imgs.length > 0) {
-              setTourCardImages(prev => ({ ...prev, [tour.slug]: `/api${imgs[0].url}` }))
+              setTourCardImages(prev => ({ ...prev, [tour.slug]: `${imgs[0].url}` }))
             }
           })
         })

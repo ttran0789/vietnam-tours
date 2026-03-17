@@ -45,7 +45,7 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 # Ensure upload directory exists
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "data", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 
 from datetime import datetime, timezone, timedelta
@@ -529,7 +529,7 @@ async def upload_image(
     with open(filepath, "wb") as f:
         f.write(content)
 
-    return {"url": f"/uploads/{tour_slug}/{filename}", "filename": filename}
+    return {"url": f"/api/uploads/{tour_slug}/{filename}", "filename": filename}
 
 
 @app.get("/api/admin/images/{tour_slug}")
@@ -538,7 +538,7 @@ def list_tour_images(tour_slug: str, admin: User = Depends(require_admin)):
     if not os.path.exists(tour_dir):
         return []
     files = sorted(os.listdir(tour_dir))
-    return [{"url": f"/uploads/{tour_slug}/{f}", "filename": f} for f in files if not f.startswith(".")]
+    return [{"url": f"/api/uploads/{tour_slug}/{f}", "filename": f} for f in files if not f.startswith(".")]
 
 
 @app.delete("/api/admin/images/{tour_slug}/{filename}")
@@ -557,7 +557,7 @@ def get_tour_images(tour_slug: str):
     if not os.path.exists(tour_dir):
         return []
     files = sorted(os.listdir(tour_dir))
-    return [{"url": f"/uploads/{tour_slug}/{f}", "filename": f} for f in files if not f.startswith(".")]
+    return [{"url": f"/api/uploads/{tour_slug}/{f}", "filename": f} for f in files if not f.startswith(".")]
 
 
 # ── Stripe Payments ──────────────────────────────────────────────────────

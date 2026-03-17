@@ -77,7 +77,7 @@ export default function TourDetail() {
   // Use uploaded images if available, fall back to Unsplash stock
   const hasUploaded = uploadedImages.length > 0
   const galleryImages = hasUploaded
-    ? uploadedImages.map(img => ({ url: `/api${img.url}`, caption: img.filename.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ') }))
+    ? uploadedImages.map(img => ({ url: `${img.url}`, caption: img.filename.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ') }))
     : (TOUR_IMAGES[tour.slug] || [])
   const heroImage = hasUploaded
     ? `/api${uploadedImages[0].url}`

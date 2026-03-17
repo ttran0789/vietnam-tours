@@ -88,7 +88,7 @@ export default function AdminImages() {
         <div className="admin-images-grid">
           {images.map(img => (
             <div key={img.filename} className="admin-image-item">
-              <img src={`/api${img.url}`} alt={img.filename} />
+              <img src={`${img.url}`} alt={img.filename} />
               <button className="admin-image-delete" onClick={() => handleDelete(img.filename)}>&times;</button>
             </div>
           ))}
