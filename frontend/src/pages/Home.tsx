@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../api'
-import { Tour } from '../types'
+import { Tour, Review } from '../types'
+import ReviewCard from '../components/ReviewCard'
 
 const PLACEHOLDER_IMAGES: Record<string, string> = {
   'ha-giang-motorbike-4d3n': 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600&h=400&fit=crop',
@@ -14,14 +15,19 @@ const PLACEHOLDER_IMAGES: Record<string, string> = {
 
 export default function Home() {
   const [tours, setTours] = useState<Tour[]>([])
+  const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
 
   useEffect(() => {
-    api.getTours()
-      .then((data: any) => setTours(data))
-      .finally(() => setLoading(false))
+    Promise.all([
+      api.getTours().then((data: any) => setTours(data)),
+      api.getReviews().then((data: any) => setReviews(data)),
+    ]).finally(() => setLoading(false))
   }, [])
+
+  // Show a mix of reviews on home page (up to 6)
+  const featuredReviews = reviews.slice(0, 6)
 
   return (
     <div>
@@ -61,6 +67,19 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {featuredReviews.length > 0 && (
+        <section className="reviews-section">
+          <div className="container">
+            <h2 className="section-title">{t('reviews.title')}</h2>
+            <div className="reviews-grid">
+              {featuredReviews.map(review => (
+                <ReviewCard key={review.id} review={review} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }

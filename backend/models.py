@@ -100,3 +100,17 @@ class TransportBooking(Base):
 
     user = relationship("User", backref="transport_bookings")
     route = relationship("TransportRoute", back_populates="transport_bookings")
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id = Column(Integer, primary_key=True, index=True)
+    tour_id = Column(Integer, ForeignKey("tours.id"), nullable=True)
+    reviewer_name = Column(String, nullable=False)
+    reviewer_country = Column(String, default="")
+    rating = Column(Integer, default=5)  # 1-5
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    tour = relationship("Tour", backref="reviews")

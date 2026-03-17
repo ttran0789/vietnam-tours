@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../api'
-import { Tour } from '../types'
+import { Tour, Review } from '../types'
 import { useAuth } from '../context/AuthContext'
+import ReviewCard from '../components/ReviewCard'
 
 export default function TourDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -11,6 +12,7 @@ export default function TourDetail() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [tour, setTour] = useState<Tour | null>(null)
+  const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [startDate, setStartDate] = useState(() => {
     const d = new Date()
@@ -26,7 +28,10 @@ export default function TourDetail() {
   useEffect(() => {
     if (slug) {
       api.getTour(slug)
-        .then((data: any) => setTour(data))
+        .then((data: any) => {
+          setTour(data)
+          api.getReviews(data.id).then((r: any) => setReviews(r))
+        })
         .finally(() => setLoading(false))
     }
   }, [slug])
@@ -126,6 +131,17 @@ export default function TourDetail() {
               </div>
             )}
           </div>
+
+          {reviews.length > 0 && (
+            <div className="tour-section">
+              <h2>{t('reviews.title')} ({reviews.length})</h2>
+              <div className="tour-reviews">
+                {reviews.map(review => (
+                  <ReviewCard key={review.id} review={review} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <aside className="tour-detail-sidebar">

@@ -658,6 +658,72 @@ a { color: var(--primary); text-decoration: none; }
   background: #dc2626;
 }
 
+/* ── Reviews ──────────────────────────────────── */
+.reviews-section {
+  background: var(--white);
+  padding: 3rem 0;
+  margin-top: 2rem;
+}
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+.tour-reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.review-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+}
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.review-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.review-meta {
+  flex: 1;
+  min-width: 0;
+}
+.review-name {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.review-country {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-light);
+}
+.review-stars {
+  flex-shrink: 0;
+}
+.star-filled { color: #f59e0b; }
+.star-empty { color: var(--border); }
+.review-text {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
 /* ── Transport ────────────────────────────────── */
 .hero-sm { padding: 3rem 1.5rem; }
 .section-title-left { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; }
@@ -773,6 +839,7 @@ a { color: var(--primary); text-decoration: none; }
   .tour-includes-grid { grid-template-columns: 1fr; }
   .booking-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
   .booking-item-details { flex-direction: column; gap: 0.25rem; }
+  .reviews-grid { grid-template-columns: 1fr; }
   .transport-layout { grid-template-columns: 1fr; }
   .admin-filters { gap: 0.375rem; }
   .admin-filters .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.7rem; }

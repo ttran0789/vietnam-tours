@@ -40,6 +40,9 @@ export const api = {
 
   getTour: (slug: string) => request(`/tours/${slug}`),
 
+  getReviews: (tourId?: number) =>
+    request(`/reviews${tourId ? `?tour_id=${tourId}` : ''}`),
+
   createBooking: (tourId: number, startDate: string, numGuests: number, comments: string) =>
     request('/bookings', {
       method: 'POST',

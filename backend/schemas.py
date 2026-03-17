@@ -115,6 +115,18 @@ class TransportBookingResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ReviewResponse(BaseModel):
+    id: int
+    tour_id: Optional[int] = None
+    reviewer_name: str
+    reviewer_country: str = ""
+    rating: int
+    text: str
+    created_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+
 class PaymentIntentCreate(BaseModel):
     booking_id: int
     booking_type: str = "tour"  # "tour" or "transport"

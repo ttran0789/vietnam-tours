@@ -143,6 +143,9 @@
     "bookTransport": "Book Transport",
     "selectRoute": "Select a route to book"
   },
+  "reviews": {
+    "title": "What Our Travelers Say"
+  },
   "whatsapp": {
     "defaultMessage": "Hi! I'm interested in booking a tour in Vietnam. Can you help me?"
   }

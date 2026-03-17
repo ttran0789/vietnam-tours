@@ -143,6 +143,9 @@
     "bookTransport": "Đặt Vận Chuyển",
     "selectRoute": "Chọn tuyến đường để đặt"
   },
+  "reviews": {
+    "title": "Khách Hàng Nói Gì"
+  },
   "whatsapp": {
     "defaultMessage": "Xin chào! Tôi muốn đặt tour du lịch Việt Nam. Bạn có thể giúp tôi không?"
   }

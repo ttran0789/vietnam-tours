@@ -10,12 +10,12 @@ import json
 load_dotenv()
 
 from database import engine, Base, get_db
-from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking
+from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review
 from schemas import (
     UserCreate, UserLogin, UserResponse, TokenResponse,
     TourResponse, BookingCreate, BookingResponse, BookingAdminAction,
     TransportRouteResponse, TransportBookingCreate, TransportBookingResponse,
-    PaymentIntentCreate,
+    ReviewResponse, PaymentIntentCreate,
 )
 from auth import hash_password, verify_password, create_access_token, get_current_user
 from email_service import (
@@ -274,6 +274,16 @@ def reject_booking(
         send_booking_rejected(user.email, user.name, tour.name, data.admin_notes)
 
     return booking
+
+
+# ── Reviews ──────────────────────────────────────────────────────────────
+
+@app.get("/api/reviews", response_model=list[ReviewResponse])
+def list_reviews(tour_id: int = None, db: Session = Depends(get_db)):
+    query = db.query(Review)
+    if tour_id:
+        query = query.filter(Review.tour_id == tour_id)
+    return query.order_by(Review.created_at.desc()).all()
 
 
 # ── Transport ────────────────────────────────────────────────────────────

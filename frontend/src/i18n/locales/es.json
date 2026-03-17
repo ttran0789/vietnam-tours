@@ -143,6 +143,9 @@
     "bookTransport": "Reservar Transporte",
     "selectRoute": "Selecciona una ruta para reservar"
   },
+  "reviews": {
+    "title": "Lo Que Dicen Nuestros Viajeros"
+  },
   "whatsapp": {
     "defaultMessage": "¡Hola! Estoy interesado en reservar un tour en Vietnam. ¿Pueden ayudarme?"
   }

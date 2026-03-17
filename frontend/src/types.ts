@@ -37,6 +37,16 @@ export interface Booking {
   user: User | null
 }
 
+export interface Review {
+  id: number
+  tour_id: number | null
+  reviewer_name: string
+  reviewer_country: string
+  rating: number
+  text: string
+  created_at: string | null
+}
+
 export interface TransportRoute {
   id: number
   origin: string

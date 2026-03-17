@@ -1,6 +1,6 @@
 import json
 from database import engine, SessionLocal, Base
-from models import Tour, User, TransportRoute
+from models import Tour, User, TransportRoute, Review
 from auth import hash_password
 
 # Prices include 20% markup from QT Motorbikes & Tours base prices
@@ -320,6 +320,57 @@ def seed():
         for route in routes:
             db.add(route)
         print(f"Seeded {len(routes)} transport routes.")
+
+    # Seed reviews
+    if db.query(Review).count() == 0:
+        reviews = [
+            # Ha Giang Motorbike 4D3N (tour_id=1)
+            Review(tour_id=1, reviewer_name="Sarah Mitchell", reviewer_country="Australia", rating=5,
+                   text="Absolutely the best experience of my entire Southeast Asia trip. The Ha Giang Loop is breathtaking — every turn reveals another jaw-dropping view. Our guide Minh was incredible, always making sure we were safe and comfortable. The homestay with the local family was so authentic. I cried when we left. Book this tour, you won't regret it."),
+            Review(tour_id=1, reviewer_name="Thomas Weber", reviewer_country="Germany", rating=5,
+                   text="I've traveled to 40+ countries and this was easily a top 3 experience. Ma Pi Leng Pass is something you have to see to believe. The group was amazing, food was delicious, and the whole trip was perfectly organized. Worth every penny."),
+            Review(tour_id=1, reviewer_name="Emma Rodriguez", reviewer_country="Spain", rating=5,
+                   text="I was nervous about riding a motorbike through mountains but the guides made me feel totally safe. They handled everything — the bike, the route, even carried my bag. The scenery is unreal, like driving through a painting. The homestay dinner with rice wine was a highlight!"),
+            Review(tour_id=1, reviewer_name="James Park", reviewer_country="Canada", rating=4,
+                   text="Great tour overall. The views are world-class and the guides know the area inside out. Only reason for 4 stars is the roads can be rough in some sections, but that's part of the adventure. The Dong Van old quarter at sunset was magical."),
+
+            # Ha Giang Express 3D2N (tour_id=2)
+            Review(tour_id=2, reviewer_name="Lisa Chen", reviewer_country="USA", rating=5,
+                   text="Perfect for those short on time. We hit all the major spots in 3 days. Yes it's fast-paced, but our guide paced it perfectly. Ma Pi Leng Pass at sunrise was a spiritual experience. The homestay was cozy and the family cooked us an amazing dinner."),
+            Review(tour_id=2, reviewer_name="Marco Rossi", reviewer_country="Italy", rating=5,
+                   text="I only had 3 days and was worried I'd miss out, but this express tour covers everything important. The guides are professional and fun. Quan Ba Heaven's Gate blew my mind. Already planning to come back for the 4-day version."),
+
+            # Big Loop 6D5N (tour_id=3)
+            Review(tour_id=3, reviewer_name="Yuki Tanaka", reviewer_country="Japan", rating=5,
+                   text="The Big Loop is the ultimate Vietnam adventure. Ba Be Lake was so peaceful, Ban Gioc Waterfall was spectacular, and then Ha Giang on top of it all. 6 days felt like the perfect length. The variety of landscapes is incredible — lakes, waterfalls, caves, mountains, rice terraces."),
+            Review(tour_id=3, reviewer_name="Anna Kowalski", reviewer_country="Poland", rating=5,
+                   text="This was the highlight of our 3-week Vietnam trip. The combination of Ba Be Lake, Cao Bang, and Ha Giang is genius. Each day felt completely different. Our guide's knowledge of local culture and history added so much depth. The Nguom Ngao Cave was unexpected and amazing."),
+
+            # Jeep Tour 4D3N (tour_id=4)
+            Review(tour_id=4, reviewer_name="Robert Hughes", reviewer_country="UK", rating=5,
+                   text="My wife and I aren't motorbike people, so the jeep tour was perfect. Same incredible scenery, but from the comfort of an open-air jeep. The driver knew every photo spot. Lung Cu Flag Tower was a proud moment. The Dong Van Old Quarter hotel was charming."),
+            Review(tour_id=4, reviewer_name="Marie Dubois", reviewer_country="France", rating=5,
+                   text="I'm 62 and was worried this trip would be too intense. It wasn't at all! The jeep is comfortable, stops are frequent, and the pace is relaxed. The H'mong King's Palace was fascinating. Our guide spoke excellent English and French. Highly recommend for older travelers or anyone who wants comfort."),
+            Review(tour_id=4, reviewer_name="David Kim", reviewer_country="South Korea", rating=4,
+                   text="Beautiful tour. The jeep gives you a different perspective than motorbikes — you can really take in the scenery without worrying about the road. The optional Nho Que River boat ride is a must-do. Food at the homestays was surprisingly good."),
+
+            # Jeep Express 3D2N (tour_id=5)
+            Review(tour_id=5, reviewer_name="Sophie Anderson", reviewer_country="New Zealand", rating=5,
+                   text="Quick but incredible. Three days in the jeep through some of the most dramatic scenery I've ever seen. Du Gia village was my favorite — so peaceful and the waterfall walk was lovely. The Lung Tam weaving demonstration was a great cultural touch."),
+            Review(tour_id=5, reviewer_name="Carlos Mendez", reviewer_country="Mexico", rating=5,
+                   text="Took this tour with my parents who are in their 70s. They loved every minute. The jeep is comfortable, the guides are attentive, and the included Hanoi transfer made logistics so easy. The views from Ma Pi Leng Pass had my mom in tears. Worth every dollar."),
+
+            # General / no specific tour
+            Review(tour_id=None, reviewer_name="Priya Sharma", reviewer_country="India", rating=5,
+                   text="Travel VN Tours made our Vietnam trip unforgettable. From the booking process to the actual tour, everything was smooth and professional. The WhatsApp communication was quick and helpful. They even helped us arrange our Hanoi hotel. Can't recommend enough!"),
+            Review(tour_id=None, reviewer_name="Michael O'Brien", reviewer_country="Ireland", rating=5,
+                   text="Booked the Ha Giang Loop and transportation from Hanoi. Everything was organized perfectly. The sleeper bus was comfortable, the tour was life-changing, and the price was very fair for what you get. These guys really care about giving you a great experience."),
+            Review(tour_id=None, reviewer_name="Nina Johansson", reviewer_country="Sweden", rating=5,
+                   text="I found Travel VN Tours through a friend's recommendation and I'm so glad I did. The booking was easy, they answered all my questions quickly, and the tour itself exceeded all expectations. Vietnam is beautiful and this team knows how to show you the best of it."),
+        ]
+        for review in reviews:
+            db.add(review)
+        print(f"Seeded {len(reviews)} reviews.")
 
     db.commit()
     db.close()
