@@ -19,6 +19,7 @@ export default function AdminImages() {
   const [uploading, setUploading] = useState(false)
   const [captions, setCaptions] = useState<Record<string, string>>({})
   const [disabledStock, setDisabledStock] = useState<string[]>([])
+  const [sharedFrom, setSharedFrom] = useState('')
   const [savedCaption, setSavedCaption] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -31,11 +32,11 @@ export default function AdminImages() {
 
   const loadImages = async (slug: string) => {
     try {
-      const [adminData, stockConfig] = await Promise.all([
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      const [adminData, stockConfig, sharedConfig] = await Promise.all([
         api.getAdminTourImages(slug),
-        fetch(`/api/admin/images/${slug}/stock-config`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        }).then(r => r.ok ? r.json() : { disabled: [] }),
+        fetch(`/api/admin/images/${slug}/stock-config`, { headers }).then(r => r.ok ? r.json() : { disabled: [] }),
+        fetch(`/api/admin/images/${slug}/shared`, { headers }).then(r => r.ok ? r.json() : { shared_from: '' }),
       ])
 
       const imgs = adminData as UploadedImage[]
@@ -44,6 +45,7 @@ export default function AdminImages() {
       imgs.forEach(img => { caps[img.filename] = img.caption || '' })
       setCaptions(caps)
       setDisabledStock(stockConfig.disabled || [])
+      setSharedFrom(sharedConfig.shared_from || '')
     } catch (e) {
       console.error('Failed to load images', e)
     }
@@ -93,7 +95,21 @@ export default function AdminImages() {
     })
   }
 
+  const handleSharedChange = (slug: string) => {
+    setSharedFrom(slug)
+    fetch(`/api/admin/images/${selectedSlug}/shared`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ shared_from: slug }),
+    })
+  }
+
   const stockImages = TOUR_IMAGES[selectedSlug] || []
+  const otherTours = tours.filter(t => t.slug !== selectedSlug)
+  const enabledCount = uploaded.length + stockImages.filter(img => !disabledStock.includes(img.url)).length
 
   return (
     <div className="container">
@@ -125,61 +141,61 @@ export default function AdminImages() {
         </label>
       </div>
 
-      <h3 className="admin-section-title">Your Photos ({uploaded.length})</h3>
-      {uploaded.length === 0 ? (
-        <p className="admin-images-hint">No photos uploaded yet. Upload your own tour photos above.</p>
-      ) : (
-        <div className="admin-images-list">
-          {uploaded.map(img => (
-            <div key={img.filename} className="admin-image-row">
-              <div className="admin-image-thumb">
-                <img src={img.url} alt={img.caption} />
-              </div>
-              <div className="admin-image-caption">
-                <input
-                  type="text"
-                  placeholder="Add a caption..."
-                  value={captions[img.filename] || ''}
-                  onChange={e => setCaptions({ ...captions, [img.filename]: e.target.value })}
-                  onBlur={() => handleCaptionSave(img.filename)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleCaptionSave(img.filename) }}
-                />
-                {savedCaption === img.filename && <span className="caption-saved">Saved</span>}
-              </div>
-              <button className="btn btn-danger btn-sm" onClick={() => handleDelete(img.filename)}>Delete</button>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="shared-photos-config">
+        <label>
+          <span>Also show photos from:</span>
+          <select value={sharedFrom} onChange={e => handleSharedChange(e.target.value)} className="tour-select-sm">
+            <option value="">None</option>
+            {otherTours.map(tour => (
+              <option key={tour.slug} value={tour.slug}>{tour.name}</option>
+            ))}
+          </select>
+        </label>
+        {sharedFrom && <span className="shared-saved">Linked</span>}
+      </div>
 
-      <h3 className="admin-section-title" style={{ marginTop: '2rem' }}>
-        Stock Photos ({stockImages.filter(img => !disabledStock.includes(img.url)).length}/{stockImages.length} enabled)
-      </h3>
-      <p className="admin-images-hint">Toggle stock photos on/off. Disabled photos won't show on the tour page.</p>
-      {stockImages.length === 0 ? (
-        <p className="admin-images-hint">No stock photos available for this tour.</p>
-      ) : (
-        <div className="admin-images-list">
-          {stockImages.map(img => (
-            <div key={img.url} className={`admin-image-row ${disabledStock.includes(img.url) ? 'admin-image-disabled' : ''}`}>
-              <label className="admin-image-toggle">
-                <input
-                  type="checkbox"
-                  checked={!disabledStock.includes(img.url)}
-                  onChange={() => toggleStock(img.url)}
-                />
-              </label>
-              <div className="admin-image-thumb">
-                <img src={img.url} alt={img.caption} />
-              </div>
-              <div className="admin-image-caption">
-                <span className="stock-caption">{img.caption}</span>
-                <span className="stock-badge">Stock</span>
-              </div>
+      <p className="admin-images-hint">{enabledCount} photos enabled for this tour.</p>
+
+      <div className="admin-images-list">
+        {uploaded.map(img => (
+          <div key={img.filename} className="admin-image-row">
+            <div className="admin-image-thumb">
+              <img src={img.url} alt={img.caption} />
             </div>
-          ))}
-        </div>
-      )}
+            <div className="admin-image-caption">
+              <input
+                type="text"
+                placeholder="Add a caption..."
+                value={captions[img.filename] || ''}
+                onChange={e => setCaptions({ ...captions, [img.filename]: e.target.value })}
+                onBlur={() => handleCaptionSave(img.filename)}
+                onKeyDown={e => { if (e.key === 'Enter') handleCaptionSave(img.filename) }}
+              />
+              {savedCaption === img.filename && <span className="caption-saved">Saved</span>}
+            </div>
+            <button className="btn btn-danger btn-sm" onClick={() => handleDelete(img.filename)}>Delete</button>
+          </div>
+        ))}
+
+        {stockImages.map(img => (
+          <div key={img.url} className={`admin-image-row ${disabledStock.includes(img.url) ? 'admin-image-disabled' : ''}`}>
+            <label className="admin-image-toggle">
+              <input
+                type="checkbox"
+                checked={!disabledStock.includes(img.url)}
+                onChange={() => toggleStock(img.url)}
+              />
+            </label>
+            <div className="admin-image-thumb">
+              <img src={img.url} alt={img.caption} />
+            </div>
+            <div className="admin-image-caption">
+              <span className="stock-caption">{img.caption}</span>
+              <span className="stock-badge">Stock</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

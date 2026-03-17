@@ -613,10 +613,50 @@ async def update_stock_config(
     return {"detail": "Stock config updated"}
 
 
+@app.get("/api/admin/images/{tour_slug}/shared")
+def get_shared_config(tour_slug: str, admin: User = Depends(require_admin)):
+    config_file = os.path.join(UPLOAD_DIR, tour_slug, "shared_from.json")
+    if os.path.exists(config_file):
+        with open(config_file) as f:
+            return json.load(f)
+    return {"shared_from": ""}
+
+
+@app.put("/api/admin/images/{tour_slug}/shared")
+async def update_shared_config(
+    tour_slug: str,
+    request: Request,
+    admin: User = Depends(require_admin),
+):
+    data = await request.json()
+    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
+    os.makedirs(tour_dir, exist_ok=True)
+    with open(os.path.join(tour_dir, "shared_from.json"), "w") as f:
+        json.dump({"shared_from": data.get("shared_from", "")}, f)
+    return {"detail": "Shared config updated"}
+
+
 @app.get("/api/images/{tour_slug}")
 def get_tour_images(tour_slug: str):
-    """Public endpoint — returns uploaded images + enabled stock images."""
+    """Public endpoint — returns uploaded images (own + shared) + disabled stock."""
+    # Check if this tour shares photos from another tour
+    shared_slug = ""
+    shared_file = os.path.join(UPLOAD_DIR, tour_slug, "shared_from.json")
+    if os.path.exists(shared_file):
+        with open(shared_file) as f:
+            shared_slug = json.load(f).get("shared_from", "")
+
+    # Own uploads
     uploaded = _list_images(tour_slug)
+    # Shared uploads (if configured and has no own uploads)
+    if not uploaded and shared_slug:
+        uploaded = _list_images(shared_slug)
+    # If has own uploads, also add shared ones
+    elif uploaded and shared_slug:
+        shared = _list_images(shared_slug)
+        # Avoid duplicates
+        own_filenames = {img["filename"] for img in uploaded}
+        uploaded += [img for img in shared if img["filename"] not in own_filenames]
 
     # Load disabled stock list
     config_file = os.path.join(UPLOAD_DIR, tour_slug, "stock_config.json")

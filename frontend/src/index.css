@@ -855,6 +855,40 @@ a { color: var(--primary); text-decoration: none; }
   outline: none;
   border-color: var(--primary);
 }
+.shared-photos-config {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.shared-photos-config label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex: 1;
+}
+.tour-select-sm {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+.tour-select-sm:focus { outline: none; border-color: var(--primary); }
+.shared-saved {
+  font-size: 0.75rem;
+  color: #065f46;
+  background: #d1fae5;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
 .caption-saved {
   font-size: 0.75rem;
   color: #065f46;
