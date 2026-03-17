@@ -6,7 +6,8 @@
       "Bash(gh repo:*)",
       "Bash(ssh:*)",
       "Bash(curl:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebSearch"
     ]
   }
 }
