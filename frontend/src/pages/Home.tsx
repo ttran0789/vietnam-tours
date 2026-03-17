@@ -19,9 +19,10 @@ export default function Home() {
         setTours(data)
         // Load uploaded images for each tour
         data.forEach((tour: Tour) => {
-          api.getTourImages(tour.slug).then((imgs: any) => {
-            if (imgs.length > 0) {
-              setTourCardImages(prev => ({ ...prev, [tour.slug]: `${imgs[0].url}` }))
+          api.getTourImages(tour.slug).then((result: any) => {
+            const uploaded = result.uploaded || []
+            if (uploaded.length > 0) {
+              setTourCardImages(prev => ({ ...prev, [tour.slug]: uploaded[0].url }))
             }
           })
         })

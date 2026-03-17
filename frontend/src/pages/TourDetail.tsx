@@ -28,7 +28,8 @@ export default function TourDetail() {
   const [booking, setBooking] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [uploadedImages, setUploadedImages] = useState<{ url: string; filename: string }[]>([])
+  const [uploadedImages, setUploadedImages] = useState<{ url: string; caption: string }[]>([])
+  const [disabledStock, setDisabledStock] = useState<string[]>([])
 
   useEffect(() => {
     if (slug) {
@@ -36,7 +37,10 @@ export default function TourDetail() {
         .then((data: any) => {
           setTour(data)
           api.getReviews(data.id).then((r: any) => setReviews(r))
-          api.getTourImages(data.slug).then((imgs: any) => setUploadedImages(imgs))
+          api.getTourImages(data.slug).then((result: any) => {
+            setUploadedImages(result.uploaded || [])
+            setDisabledStock(result.disabled_stock || [])
+          })
         })
         .finally(() => setLoading(false))
     }
@@ -74,14 +78,13 @@ export default function TourDetail() {
   const itinerary = tour.itinerary ? JSON.parse(tour.itinerary) : []
   const included = tour.included ? JSON.parse(tour.included) : []
   const notIncluded = tour.not_included ? JSON.parse(tour.not_included) : []
-  // Use uploaded images if available, fall back to Unsplash stock
-  const hasUploaded = uploadedImages.length > 0
-  const galleryImages = hasUploaded
-    ? uploadedImages.map(img => ({ url: `${img.url}`, caption: img.filename.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ') }))
-    : (TOUR_IMAGES[tour.slug] || [])
-  const heroImage = hasUploaded
-    ? `/api${uploadedImages[0].url}`
-    : TOUR_HERO_IMAGES[tour.slug]
+  // Combine uploaded images + enabled stock images
+  const uploadedGallery = uploadedImages.map((img: any) => ({ url: img.url, caption: img.caption || '' }))
+  const stockGallery = (TOUR_IMAGES[tour.slug] || []).filter(img => !disabledStock.includes(img.url))
+  const galleryImages = [...uploadedGallery, ...stockGallery]
+  const heroImage = uploadedImages.length > 0
+    ? uploadedImages[0].url
+    : (stockGallery.length > 0 ? stockGallery[0].url : TOUR_HERO_IMAGES[tour.slug])
 
   return (
     <div>

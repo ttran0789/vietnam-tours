@@ -147,6 +147,9 @@ export const api = {
     })
   },
 
+  updateImageCaption: (tourSlug: string, filename: string, caption: string) =>
+    request(`/admin/images/${tourSlug}/${filename}/caption?caption=${encodeURIComponent(caption)}`, { method: 'PUT' }),
+
   deleteTourImage: (tourSlug: string, filename: string) =>
     request(`/admin/images/${tourSlug}/${filename}`, { method: 'DELETE' }),
 

@@ -529,16 +529,52 @@ async def upload_image(
     with open(filepath, "wb") as f:
         f.write(content)
 
-    return {"url": f"/api/uploads/{tour_slug}/{filename}", "filename": filename}
+    return {"url": f"/api/uploads/{tour_slug}/{filename}", "filename": filename, "caption": ""}
+
+
+def _load_captions(tour_slug: str) -> dict:
+    caption_file = os.path.join(UPLOAD_DIR, tour_slug, "captions.json")
+    if os.path.exists(caption_file):
+        with open(caption_file) as f:
+            return json.load(f)
+    return {}
+
+
+def _save_captions(tour_slug: str, captions: dict):
+    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
+    os.makedirs(tour_dir, exist_ok=True)
+    with open(os.path.join(tour_dir, "captions.json"), "w") as f:
+        json.dump(captions, f)
+
+
+def _list_images(tour_slug: str) -> list:
+    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
+    if not os.path.exists(tour_dir):
+        return []
+    captions = _load_captions(tour_slug)
+    files = sorted(f for f in os.listdir(tour_dir) if not f.startswith(".") and f != "captions.json")
+    return [{"url": f"/api/uploads/{tour_slug}/{f}", "filename": f, "caption": captions.get(f, "")} for f in files]
 
 
 @app.get("/api/admin/images/{tour_slug}")
 def list_tour_images(tour_slug: str, admin: User = Depends(require_admin)):
-    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
-    if not os.path.exists(tour_dir):
-        return []
-    files = sorted(os.listdir(tour_dir))
-    return [{"url": f"/api/uploads/{tour_slug}/{f}", "filename": f} for f in files if not f.startswith(".")]
+    return _list_images(tour_slug)
+
+
+@app.put("/api/admin/images/{tour_slug}/{filename}/caption")
+def update_image_caption(
+    tour_slug: str,
+    filename: str,
+    admin: User = Depends(require_admin),
+    caption: str = "",
+):
+    filepath = os.path.join(UPLOAD_DIR, tour_slug, filename)
+    if not os.path.exists(filepath):
+        raise HTTPException(status_code=404, detail="Image not found")
+    captions = _load_captions(tour_slug)
+    captions[filename] = caption
+    _save_captions(tour_slug, captions)
+    return {"detail": "Caption updated"}
 
 
 @app.delete("/api/admin/images/{tour_slug}/{filename}")
@@ -547,17 +583,49 @@ def delete_tour_image(tour_slug: str, filename: str, admin: User = Depends(requi
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="Image not found")
     os.remove(filepath)
+    # Remove caption
+    captions = _load_captions(tour_slug)
+    captions.pop(filename, None)
+    _save_captions(tour_slug, captions)
     return {"detail": "Image deleted"}
+
+
+@app.get("/api/admin/images/{tour_slug}/stock-config")
+def get_stock_config(tour_slug: str, admin: User = Depends(require_admin)):
+    config_file = os.path.join(UPLOAD_DIR, tour_slug, "stock_config.json")
+    if os.path.exists(config_file):
+        with open(config_file) as f:
+            return json.load(f)
+    return {"disabled": []}
+
+
+@app.put("/api/admin/images/{tour_slug}/stock-config")
+async def update_stock_config(
+    tour_slug: str,
+    request: Request,
+    admin: User = Depends(require_admin),
+):
+    data = await request.json()
+    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
+    os.makedirs(tour_dir, exist_ok=True)
+    with open(os.path.join(tour_dir, "stock_config.json"), "w") as f:
+        json.dump({"disabled": data.get("disabled", [])}, f)
+    return {"detail": "Stock config updated"}
 
 
 @app.get("/api/images/{tour_slug}")
 def get_tour_images(tour_slug: str):
-    """Public endpoint — returns uploaded images for a tour, or empty list."""
-    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
-    if not os.path.exists(tour_dir):
-        return []
-    files = sorted(os.listdir(tour_dir))
-    return [{"url": f"/api/uploads/{tour_slug}/{f}", "filename": f} for f in files if not f.startswith(".")]
+    """Public endpoint — returns uploaded images + enabled stock images."""
+    uploaded = _list_images(tour_slug)
+
+    # Load disabled stock list
+    config_file = os.path.join(UPLOAD_DIR, tour_slug, "stock_config.json")
+    disabled = []
+    if os.path.exists(config_file):
+        with open(config_file) as f:
+            disabled = json.load(f).get("disabled", [])
+
+    return {"uploaded": uploaded, "disabled_stock": disabled}
 
 
 # ── Stripe Payments ──────────────────────────────────────────────────────
