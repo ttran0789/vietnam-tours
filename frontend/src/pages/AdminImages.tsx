@@ -19,6 +19,7 @@ export default function AdminImages() {
   const [uploading, setUploading] = useState(false)
   const [captions, setCaptions] = useState<Record<string, string>>({})
   const [disabledStock, setDisabledStock] = useState<string[]>([])
+  const [savedCaption, setSavedCaption] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -72,6 +73,8 @@ export default function AdminImages() {
 
   const handleCaptionSave = async (filename: string) => {
     await api.updateImageCaption(selectedSlug, filename, captions[filename] || '')
+    setSavedCaption(filename)
+    setTimeout(() => setSavedCaption(''), 1500)
   }
 
   const toggleStock = async (stockUrl: string) => {
@@ -141,6 +144,7 @@ export default function AdminImages() {
                   onBlur={() => handleCaptionSave(img.filename)}
                   onKeyDown={e => { if (e.key === 'Enter') handleCaptionSave(img.filename) }}
                 />
+                {savedCaption === img.filename && <span className="caption-saved">Saved</span>}
               </div>
               <button className="btn btn-danger btn-sm" onClick={() => handleDelete(img.filename)}>Delete</button>
             </div>

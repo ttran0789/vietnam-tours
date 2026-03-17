@@ -855,6 +855,11 @@ a { color: var(--primary); text-decoration: none; }
   outline: none;
   border-color: var(--primary);
 }
+.caption-saved {
+  font-size: 0.75rem;
+  color: #065f46;
+  margin-left: 0.5rem;
+}
 .admin-image-toggle {
   flex-shrink: 0;
   display: flex;
