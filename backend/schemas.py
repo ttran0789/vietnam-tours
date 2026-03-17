@@ -19,8 +19,20 @@ class UserResponse(BaseModel):
     email: str
     name: str
     is_admin: bool = False
+    phone: str = ""
+    whatsapp: str = ""
+    zalo: str = ""
+    nationality: str = ""
 
     model_config = {"from_attributes": True}
+
+
+class UserUpdate(BaseModel):
+    name: str = ""
+    phone: str = ""
+    whatsapp: str = ""
+    zalo: str = ""
+    nationality: str = ""
 
 
 class ForgotPassword(BaseModel):

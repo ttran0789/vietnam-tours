@@ -115,6 +115,17 @@
     "passwordChanged": "Đã Đổi Mật Khẩu!",
     "passwordChangedDesc": "Mật khẩu đã được cập nhật thành công."
   },
+  "profile": {
+    "title": "Hồ Sơ Của Tôi",
+    "contactInfo": "Thông Tin Liên Hệ",
+    "contactDesc": "Giúp chúng tôi liên lạc bạn trong chuyến đi. WhatsApp hoặc Zalo được ưu tiên.",
+    "name": "Họ và Tên",
+    "email": "Email",
+    "phone": "Số Điện Thoại",
+    "nationality": "Quốc Tịch",
+    "saveProfile": "Lưu Hồ Sơ",
+    "saved": "Hồ sơ đã được cập nhật!"
+  },
   "payment": {
     "title": "Hoàn Tất Thanh Toán",
     "loading": "Đang tải thanh toán...",

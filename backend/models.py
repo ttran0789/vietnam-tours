@@ -21,6 +21,10 @@ class User(Base):
     name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
+    phone = Column(String, default="")
+    whatsapp = Column(String, default="")
+    zalo = Column(String, default="")
+    nationality = Column(String, default="")
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     bookings = relationship("Booking", back_populates="user")

@@ -23,7 +23,7 @@ from email_service import (
     send_booking_approved, send_booking_rejected, send_payment_confirmed,
     send_welcome, send_password_reset,
 )
-from schemas import ForgotPassword, ResetPassword, ChangePassword
+from schemas import ForgotPassword, ResetPassword, ChangePassword, UserUpdate
 from seed_data import seed
 
 Base.metadata.create_all(bind=engine)
@@ -92,6 +92,23 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
 
 @app.get("/api/auth/me", response_model=UserResponse)
 def me(user: User = Depends(get_current_user)):
+    return UserResponse.model_validate(user)
+
+
+@app.put("/api/auth/profile", response_model=UserResponse)
+def update_profile(
+    data: UserUpdate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if data.name:
+        user.name = data.name
+    user.phone = data.phone
+    user.whatsapp = data.whatsapp
+    user.zalo = data.zalo
+    user.nationality = data.nationality
+    db.commit()
+    db.refresh(user)
     return UserResponse.model_validate(user)
 
 

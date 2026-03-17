@@ -115,6 +115,17 @@
     "passwordChanged": "¡Contraseña Cambiada!",
     "passwordChangedDesc": "Tu contraseña ha sido actualizada exitosamente."
   },
+  "profile": {
+    "title": "Mi Perfil",
+    "contactInfo": "Información de Contacto",
+    "contactDesc": "Ayúdanos a contactarte durante tu viaje. WhatsApp o Zalo es preferido.",
+    "name": "Nombre Completo",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "nationality": "Nacionalidad",
+    "saveProfile": "Guardar Perfil",
+    "saved": "¡Perfil actualizado exitosamente!"
+  },
   "payment": {
     "title": "Completar Pago",
     "loading": "Cargando pago...",

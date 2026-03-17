@@ -54,6 +54,12 @@ export const api = {
       body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
     }),
 
+  updateProfile: (data: { name: string; phone: string; whatsapp: string; zalo: string; nationality: string }) =>
+    request('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
   getTours: () => request('/tours'),
 
   getTour: (slug: string) => request(`/tours/${slug}`),
