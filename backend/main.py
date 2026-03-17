@@ -17,12 +17,13 @@ from schemas import (
     TransportRouteResponse, TransportBookingCreate, TransportBookingResponse,
     ReviewResponse, PaymentIntentCreate,
 )
-from auth import hash_password, verify_password, create_access_token, get_current_user
+from auth import hash_password, verify_password, create_access_token, get_current_user, create_reset_token, verify_reset_token
 from email_service import (
     send_booking_submitted, send_admin_new_booking,
     send_booking_approved, send_booking_rejected, send_payment_confirmed,
-    send_welcome,
+    send_welcome, send_password_reset,
 )
+from schemas import ForgotPassword, ResetPassword, ChangePassword
 from seed_data import seed
 
 Base.metadata.create_all(bind=engine)
@@ -92,6 +93,44 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
 @app.get("/api/auth/me", response_model=UserResponse)
 def me(user: User = Depends(get_current_user)):
     return UserResponse.model_validate(user)
+
+
+@app.post("/api/auth/forgot-password")
+def forgot_password(data: ForgotPassword, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == data.email).first()
+    if user:
+        token = create_reset_token(user.email)
+        send_password_reset(user.email, user.name, token)
+    # Always return success to avoid email enumeration
+    return {"detail": "If an account exists with that email, a reset link has been sent."}
+
+
+@app.post("/api/auth/reset-password")
+def reset_password(data: ResetPassword, db: Session = Depends(get_db)):
+    email = verify_reset_token(data.token)
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid reset link")
+    if len(data.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    user.hashed_password = hash_password(data.password)
+    db.commit()
+    return {"detail": "Password has been reset successfully"}
+
+
+@app.post("/api/auth/change-password")
+def change_password(
+    data: ChangePassword,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not verify_password(data.current_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    user.hashed_password = hash_password(data.new_password)
+    db.commit()
+    return {"detail": "Password changed successfully"}
 
 
 # ── Tours ────────────────────────────────────────────────────────────────

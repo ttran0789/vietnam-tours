@@ -171,6 +171,21 @@ def send_payment_confirmed(user_email: str, user_name: str, tour_name: str, star
     _send_email(user_email, f"Tour Confirmed! - {tour_name}", _base_template(content))
 
 
+def send_password_reset(user_email: str, user_name: str, reset_token: str):
+    """Email with password reset link."""
+    reset_url = f"{FRONTEND_URL}/reset-password?token={reset_token}"
+    content = f"""
+    <h2 style="color: #1e293b;">Reset Your Password</h2>
+    <p>Hi {user_name},</p>
+    <p>We received a request to reset your password. Click the button below to set a new password:</p>
+    <p style="margin-top: 20px;">
+      <a href="{reset_url}" style="background: #0f766e; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Reset Password</a>
+    </p>
+    <p style="margin-top: 20px; color: #64748b; font-size: 0.85rem;">This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>
+    """
+    _send_email(user_email, "Reset Your Password - Travel VN Tours", _base_template(content))
+
+
 def send_welcome(user_email: str, user_name: str):
     """Welcome email when a new user registers."""
     content = f"""

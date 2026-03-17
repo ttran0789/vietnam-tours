@@ -36,6 +36,24 @@ export const api = {
 
   getMe: () => request('/auth/me'),
 
+  forgotPassword: (email: string) =>
+    request('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  resetPassword: (token: string, password: string) =>
+    request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    }),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+    }),
+
   getTours: () => request('/tours'),
 
   getTour: (slug: string) => request(`/tours/${slug}`),

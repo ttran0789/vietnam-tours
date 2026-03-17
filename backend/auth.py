@@ -35,6 +35,25 @@ def create_access_token(data: dict) -> str:
     return jwt.encode(to_encode, _secret_key(), algorithm=ALGORITHM)
 
 
+def create_reset_token(email: str) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(hours=1)
+    return jwt.encode({"sub": email, "type": "reset", "exp": expire}, _secret_key(), algorithm=ALGORITHM)
+
+
+def verify_reset_token(token: str) -> str:
+    """Returns email if valid, raises exception otherwise."""
+    try:
+        payload = jwt.decode(token, _secret_key(), algorithms=[ALGORITHM])
+        if payload.get("type") != "reset":
+            raise ValueError("Invalid token type")
+        email = payload.get("sub")
+        if not email:
+            raise ValueError("No email in token")
+        return email
+    except (JWTError, ValueError):
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link")
+
+
 def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> User:

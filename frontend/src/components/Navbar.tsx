@@ -46,6 +46,7 @@ export default function Navbar() {
               {user.is_admin && (
                 <NavLink to="/admin/bookings">{t('nav.admin')}</NavLink>
               )}
+              <NavLink to="/change-password">{t('auth.changePassword')}</NavLink>
               <span className="nav-user">{t('nav.greeting', { name: user.name })}</span>
               <button onClick={() => { logout(); closeMenu() }} className="btn btn-outline btn-sm">{t('nav.logout')}</button>
             </>

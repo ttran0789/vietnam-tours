@@ -46,6 +46,10 @@ export default function Login() {
           <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
         </label>
 
+        <p className="auth-link" style={{ marginTop: 0, marginBottom: '0.5rem' }}>
+          <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
+        </p>
+
         <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
           {loading ? t('login.submitting') : t('login.submit')}
         </button>
