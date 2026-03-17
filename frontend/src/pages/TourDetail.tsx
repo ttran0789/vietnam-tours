@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import ReviewCard from '../components/ReviewCard'
 import PhotoGallery from '../components/PhotoGallery'
 import { TOUR_IMAGES, TOUR_HERO_IMAGES } from '../data/tourImages'
+import { isInstantBooking } from '../utils/booking'
 
 export default function TourDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -236,9 +237,17 @@ export default function TourDetail() {
                     onClick={handleBook}
                     disabled={booking}
                   >
-                    {booking ? t('tour.booking') : user ? t('tour.submitRequest') : t('tour.loginToBook')}
+                    {booking
+                    ? t('tour.booking')
+                    : !user
+                    ? t('tour.loginToBook')
+                    : isInstantBooking(startDate)
+                    ? t('tour.bookNow')
+                    : t('tour.submitRequest')}
                   </button>
-                  <p className="booking-note">{t('tour.bookingNote')}</p>
+                  <p className="booking-note">
+                    {isInstantBooking(startDate) ? t('tour.instantNote') : t('tour.bookingNote')}
+                  </p>
                 </div>
               )}
             </div>

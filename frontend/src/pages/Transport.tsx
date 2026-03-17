@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { api } from '../api'
 import { TransportRoute } from '../types'
 import { useAuth } from '../context/AuthContext'
+import { isInstantBooking } from '../utils/booking'
 
 export default function Transport() {
   const [routes, setRoutes] = useState<TransportRoute[]>([])
@@ -182,9 +183,17 @@ export default function Transport() {
                         onClick={handleBook}
                         disabled={submitting}
                       >
-                        {submitting ? t('tour.booking') : user ? t('transport.bookTransport') : t('tour.loginToBook')}
+                        {submitting
+                          ? t('tour.booking')
+                          : !user
+                          ? t('tour.loginToBook')
+                          : isInstantBooking(travelDate)
+                          ? t('tour.bookNow')
+                          : t('tour.submitRequest')}
                       </button>
-                      <p className="booking-note">{t('tour.bookingNote')}</p>
+                      <p className="booking-note">
+                        {isInstantBooking(travelDate) ? t('tour.instantNote') : t('tour.bookingNote')}
+                      </p>
                     </div>
                   )}
                 </div>
