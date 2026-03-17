@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '../api'
 import { Booking, TransportBooking } from '../types'
+import SEO from '../components/SEO'
 
 interface Stats {
   total_customers: number
@@ -77,6 +78,7 @@ export default function AdminBookings() {
 
   return (
     <div className="container">
+      <SEO title="Admin Dashboard" />
       <h1 className="page-title">{t('admin.title')}</h1>
 
       {stats && (

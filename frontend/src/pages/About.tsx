@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import SEO from '../components/SEO'
 
 const PHONE = '17205938387'
 const EMAIL = 'bookings@travelvntours.com'
@@ -10,6 +11,7 @@ export default function About() {
 
   return (
     <div>
+      <SEO title="About Us" description="Travel VN Tours - Founded by a Vietnamese-American passionate about sharing authentic northern Vietnam experiences. Local guides, fair prices, safety first." url="https://travelvntours.com/about" />
       <section className="hero hero-sm">
         <div className="hero-content">
           <h1>{t('about.heroTitle')}</h1>

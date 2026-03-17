@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
+import SEO from '../components/SEO'
 
 export default function Login() {
   const { login } = useAuth()
@@ -28,6 +29,7 @@ export default function Login() {
 
   return (
     <div className="auth-page">
+      <SEO title="Login" url="https://travelvntours.com/login" />
       <form className="auth-form" onSubmit={handleSubmit}>
         <h1>{t('login.title')}</h1>
         <p className="auth-subtitle">{t('login.subtitle')}</p>

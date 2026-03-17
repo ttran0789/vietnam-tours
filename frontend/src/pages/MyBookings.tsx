@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../api'
 import { Booking, TransportBooking } from '../types'
+import SEO from '../components/SEO'
 
 const STATUS_STYLES: Record<string, string> = {
   pending: 'status-pending',
@@ -46,6 +47,7 @@ export default function MyBookings() {
 
   return (
     <div className="container">
+      <SEO title="My Bookings" />
       <h1 className="page-title">{t('bookings.title')}</h1>
 
       {isEmpty ? (

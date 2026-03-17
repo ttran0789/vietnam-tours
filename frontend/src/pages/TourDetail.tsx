@@ -8,6 +8,7 @@ import ReviewCard from '../components/ReviewCard'
 import PhotoGallery from '../components/PhotoGallery'
 import { TOUR_IMAGES, TOUR_HERO_IMAGES } from '../data/tourImages'
 import { isInstantBooking } from '../utils/booking'
+import SEO from '../components/SEO'
 
 export default function TourDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -76,6 +77,7 @@ export default function TourDetail() {
 
   return (
     <div>
+      <SEO title={tour.name} description={tour.description} image={heroImage} url={`https://travelvntours.com/tours/${tour.slug}`} />
       {heroImage && (
         <div className="tour-hero">
           <img src={heroImage} alt={tour.name} />

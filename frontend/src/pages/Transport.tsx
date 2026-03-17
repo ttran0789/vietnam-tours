@@ -5,6 +5,7 @@ import { api } from '../api'
 import { TransportRoute } from '../types'
 import { useAuth } from '../context/AuthContext'
 import { isInstantBooking } from '../utils/booking'
+import SEO from '../components/SEO'
 
 export default function Transport() {
   const [routes, setRoutes] = useState<TransportRoute[]>([])
@@ -57,6 +58,7 @@ export default function Transport() {
 
   return (
     <div>
+      <SEO title="Transportation" description="Comfortable transfers between Vietnam's top destinations. Hanoi to Ha Giang, Sapa, Ninh Binh and back." url="https://travelvntours.com/transport" />
       <section className="hero hero-sm">
         <div className="hero-content">
           <h1>{t('transport.heroTitle')}</h1>

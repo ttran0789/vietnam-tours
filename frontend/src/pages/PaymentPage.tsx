@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { api } from '../api'
+import SEO from '../components/SEO'
 
 function CheckoutForm({ bookingId }: { bookingId: number }) {
   const stripe = useStripe()
@@ -116,6 +117,7 @@ export default function PaymentPage() {
 
   return (
     <div className="container">
+      <SEO title="Payment" />
       <div className="payment-container">
         <h1>{t('payment.title')}</h1>
         {error && <div className="error-message">{error}</div>}
