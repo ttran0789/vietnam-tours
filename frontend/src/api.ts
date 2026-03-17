@@ -125,6 +125,31 @@ export const api = {
       body: JSON.stringify({ admin_notes: adminNotes }),
     }),
 
+  // Images
+  getTourImages: (tourSlug: string) =>
+    request(`/images/${tourSlug}`),
+
+  getAdminTourImages: (tourSlug: string) =>
+    request(`/admin/images/${tourSlug}`),
+
+  uploadTourImage: (tourSlug: string, file: File) => {
+    const formData = new FormData()
+    formData.append('tour_slug', tourSlug)
+    formData.append('file', file)
+    const token = localStorage.getItem('token')
+    return fetch('/api/admin/upload', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    }).then(res => {
+      if (!res.ok) throw new Error('Upload failed')
+      return res.json()
+    })
+  },
+
+  deleteTourImage: (tourSlug: string, filename: string) =>
+    request(`/admin/images/${tourSlug}/${filename}`, { method: 'DELETE' }),
+
   createPaymentIntent: (bookingId: number, bookingType: string = 'tour') =>
     request<{ client_secret: string }>('/payments/create-intent', {
       method: 'POST',

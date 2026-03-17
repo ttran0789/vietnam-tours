@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Request
+from fastapi import FastAPI, Depends, HTTPException, status, Request, UploadFile, File, Form
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -31,6 +32,9 @@ seed()
 
 app = FastAPI(title="Vietnam Tours API")
 
+# Serve uploaded images at /api/uploads/
+app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("FRONTEND_URL", "http://localhost:5173")],
@@ -40,6 +44,10 @@ app.add_middleware(
 )
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
+
+# Ensure upload directory exists
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "data", "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 from datetime import datetime, timezone, timedelta
@@ -496,6 +504,62 @@ def reject_transport_booking(
         send_booking_rejected(user.email, user.name, f"Transport: {route.origin} → {route.destination}", data.admin_notes)
 
     return tb
+
+
+# ── Image Uploads ────────────────────────────────────────────────────────
+
+@app.post("/api/admin/upload")
+async def upload_image(
+    tour_slug: str = Form(...),
+    file: UploadFile = File(...),
+    admin: User = Depends(require_admin),
+):
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+
+    # Create tour directory
+    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
+    os.makedirs(tour_dir, exist_ok=True)
+
+    # Save with unique name
+    import uuid
+    ext = file.filename.split(".")[-1] if file.filename and "." in file.filename else "jpg"
+    filename = f"{uuid.uuid4().hex[:8]}.{ext}"
+    filepath = os.path.join(tour_dir, filename)
+
+    content = await file.read()
+    with open(filepath, "wb") as f:
+        f.write(content)
+
+    return {"url": f"/api/uploads/{tour_slug}/{filename}", "filename": filename}
+
+
+@app.get("/api/admin/images/{tour_slug}")
+def list_tour_images(tour_slug: str, admin: User = Depends(require_admin)):
+    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
+    if not os.path.exists(tour_dir):
+        return []
+    files = sorted(os.listdir(tour_dir))
+    return [{"url": f"/api/uploads/{tour_slug}/{f}", "filename": f} for f in files if not f.startswith(".")]
+
+
+@app.delete("/api/admin/images/{tour_slug}/{filename}")
+def delete_tour_image(tour_slug: str, filename: str, admin: User = Depends(require_admin)):
+    filepath = os.path.join(UPLOAD_DIR, tour_slug, filename)
+    if not os.path.exists(filepath):
+        raise HTTPException(status_code=404, detail="Image not found")
+    os.remove(filepath)
+    return {"detail": "Image deleted"}
+
+
+@app.get("/api/images/{tour_slug}")
+def get_tour_images(tour_slug: str):
+    """Public endpoint — returns uploaded images for a tour, or empty list."""
+    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
+    if not os.path.exists(tour_dir):
+        return []
+    files = sorted(os.listdir(tour_dir))
+    return [{"url": f"/api/uploads/{tour_slug}/{f}", "filename": f} for f in files if not f.startswith(".")]
 
 
 # ── Stripe Payments ──────────────────────────────────────────────────────

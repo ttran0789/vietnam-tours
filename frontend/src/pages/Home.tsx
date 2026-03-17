@@ -8,13 +8,24 @@ import { TOUR_CARD_IMAGES } from '../data/tourImages'
 
 export default function Home() {
   const [tours, setTours] = useState<Tour[]>([])
+  const [tourCardImages, setTourCardImages] = useState<Record<string, string>>({})
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
 
   useEffect(() => {
     Promise.all([
-      api.getTours().then((data: any) => setTours(data)),
+      api.getTours().then((data: any) => {
+        setTours(data)
+        // Load uploaded images for each tour
+        data.forEach((tour: Tour) => {
+          api.getTourImages(tour.slug).then((imgs: any) => {
+            if (imgs.length > 0) {
+              setTourCardImages(prev => ({ ...prev, [tour.slug]: `/api${imgs[0].url}` }))
+            }
+          })
+        })
+      }),
       api.getReviews().then((data: any) => setReviews(data)),
     ]).finally(() => setLoading(false))
   }, [])
@@ -41,7 +52,7 @@ export default function Home() {
               <Link to={`/tours/${tour.slug}`} key={tour.id} className="tour-card">
                 <div className="tour-card-image">
                   <img
-                    src={TOUR_CARD_IMAGES[tour.slug] || 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600&h=400&fit=crop'}
+                    src={tourCardImages[tour.slug] || TOUR_CARD_IMAGES[tour.slug] || 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600&h=400&fit=crop'}
                     alt={tour.name}
                   />
                   <span className="tour-card-badge">{tour.difficulty}</span>

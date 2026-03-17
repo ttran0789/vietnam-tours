@@ -14,6 +14,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
 import BookingConfirmed from './pages/BookingConfirmed'
+import AdminImages from './pages/AdminImages'
 import WhatsAppButton from './components/WhatsAppButton'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/payment/:bookingId" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
           <Route path="/admin/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
+          <Route path="/admin/images" element={<AdminRoute><AdminImages /></AdminRoute>} />
         </Routes>
       </main>
       <WhatsAppButton />
