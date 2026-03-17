@@ -169,3 +169,23 @@ def send_payment_confirmed(user_email: str, user_name: str, tour_name: str, star
     </p>
     """
     _send_email(user_email, f"Tour Confirmed! - {tour_name}", _base_template(content))
+
+
+def send_welcome(user_email: str, user_name: str):
+    """Welcome email when a new user registers."""
+    content = f"""
+    <h2 style="color: #0f766e;">Welcome to Travel VN Tours!</h2>
+    <p>Hi {user_name},</p>
+    <p>Thanks for creating an account. You're one step closer to an unforgettable Vietnam adventure.</p>
+    <p>Here's what you can do:</p>
+    <ul style="color: #1e293b; line-height: 2;">
+      <li>Browse our Ha Giang Loop motorbike and jeep tours</li>
+      <li>Book comfortable transportation between cities</li>
+      <li>Add special requests like food restrictions or group preferences</li>
+    </ul>
+    <p>Have questions? Just reply to this email or message us on WhatsApp — we're always happy to help.</p>
+    <p style="margin-top: 20px;">
+      <a href="{FRONTEND_URL}" style="background: #0f766e; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Browse Tours</a>
+    </p>
+    """
+    _send_email(user_email, "Welcome to Travel VN Tours!", _base_template(content))

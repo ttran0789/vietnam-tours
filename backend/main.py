@@ -21,6 +21,7 @@ from auth import hash_password, verify_password, create_access_token, get_curren
 from email_service import (
     send_booking_submitted, send_admin_new_booking,
     send_booking_approved, send_booking_rejected, send_payment_confirmed,
+    send_welcome,
 )
 from seed_data import seed
 
@@ -75,6 +76,7 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
     token = create_access_token({"sub": user.id})
+    send_welcome(user.email, user.name)
     return TokenResponse(access_token=token, user=UserResponse.model_validate(user))
 
 
