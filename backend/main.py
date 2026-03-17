@@ -32,9 +32,6 @@ seed()
 
 app = FastAPI(title="Vietnam Tours API")
 
-# Serve uploaded images at /api/uploads/
-app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[os.getenv("FRONTEND_URL", "http://localhost:5173")],
@@ -48,6 +45,7 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 # Ensure upload directory exists
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "data", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 
 from datetime import datetime, timezone, timedelta
