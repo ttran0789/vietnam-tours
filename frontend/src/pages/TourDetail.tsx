@@ -30,6 +30,7 @@ export default function TourDetail() {
   const [success, setSuccess] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<{ url: string; caption: string }[]>([])
   const [disabledStock, setDisabledStock] = useState<string[]>([])
+  const [coverUrl, setCoverUrl] = useState('')
 
   useEffect(() => {
     if (slug) {
@@ -40,6 +41,7 @@ export default function TourDetail() {
           api.getTourImages(data.slug).then((result: any) => {
             setUploadedImages(result.uploaded || [])
             setDisabledStock(result.disabled_stock || [])
+            setCoverUrl(result.cover || '')
           })
         })
         .finally(() => setLoading(false))
@@ -82,9 +84,10 @@ export default function TourDetail() {
   const uploadedGallery = uploadedImages.map((img: any) => ({ url: img.url, caption: img.caption || '' }))
   const stockGallery = (TOUR_IMAGES[tour.slug] || []).filter(img => !disabledStock.includes(img.url))
   const galleryImages = [...uploadedGallery, ...stockGallery]
-  const heroImage = uploadedImages.length > 0
-    ? uploadedImages[0].url
-    : (stockGallery.length > 0 ? stockGallery[0].url : TOUR_HERO_IMAGES[tour.slug])
+  const heroImage = coverUrl
+    || (uploadedImages.length > 0 ? uploadedImages[0].url : null)
+    || (stockGallery.length > 0 ? stockGallery[0].url : null)
+    || TOUR_HERO_IMAGES[tour.slug]
 
   return (
     <div>

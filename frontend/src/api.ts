@@ -154,10 +154,10 @@ export const api = {
   getTourPhotoConfig: (tourSlug: string) =>
     request(`/admin/tour-photos/${tourSlug}`),
 
-  updateTourPhotoConfig: (tourSlug: string, enabled: string[], disabledStock: string[]) =>
+  updateTourPhotoConfig: (tourSlug: string, enabled: string[], disabledStock: string[], cover: string = '') =>
     request(`/admin/tour-photos/${tourSlug}`, {
       method: 'PUT',
-      body: JSON.stringify({ enabled, disabled_stock: disabledStock }),
+      body: JSON.stringify({ enabled, disabled_stock: disabledStock, cover }),
     }),
 
   createPaymentIntent: (bookingId: number, bookingType: string = 'tour') =>

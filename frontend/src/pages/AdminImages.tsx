@@ -17,6 +17,7 @@ export default function AdminImages() {
   const [enabledFiles, setEnabledFiles] = useState<string[]>([])
   const [disabledStock, setDisabledStock] = useState<string[]>([])
   const [captions, setCaptions] = useState<Record<string, string>>({})
+  const [cover, setCover] = useState('')
   const [uploading, setUploading] = useState(false)
   const [savedCaption, setSavedCaption] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
@@ -42,12 +43,13 @@ export default function AdminImages() {
       api.getTourPhotoConfig(selectedSlug).then((config: any) => {
         setEnabledFiles(config.enabled || [])
         setDisabledStock(config.disabled_stock || [])
+        setCover(config.cover || '')
       })
     }
   }, [selectedSlug])
 
-  const saveConfig = (enabled: string[], disabled: string[]) => {
-    api.updateTourPhotoConfig(selectedSlug, enabled, disabled)
+  const saveConfig = (enabled: string[], disabled: string[], coverFile: string = cover) => {
+    api.updateTourPhotoConfig(selectedSlug, enabled, disabled, coverFile)
   }
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +94,22 @@ export default function AdminImages() {
       : [...disabledStock, stockUrl]
     setDisabledStock(newDisabled)
     saveConfig(enabledFiles, newDisabled)
+  }
+
+  const handleSetCover = (filename: string) => {
+    setCover(filename)
+    // Also enable it if not already
+    const newEnabled = enabledFiles.includes(filename) ? enabledFiles : [...enabledFiles, filename]
+    setEnabledFiles(newEnabled)
+    saveConfig(newEnabled, disabledStock, filename)
+  }
+
+  const handleSetStockCover = (stockUrl: string) => {
+    setCover(stockUrl)
+    // Also enable it if disabled
+    const newDisabled = disabledStock.filter(u => u !== stockUrl)
+    setDisabledStock(newDisabled)
+    saveConfig(enabledFiles, newDisabled, stockUrl)
   }
 
   const stockImages = TOUR_IMAGES[selectedSlug] || []
@@ -154,6 +172,13 @@ export default function AdminImages() {
               />
               {savedCaption === photo.filename && <span className="caption-saved">Saved</span>}
             </div>
+            <button
+              className={`btn btn-sm ${cover === photo.filename ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => handleSetCover(photo.filename)}
+              title="Set as cover"
+            >
+              {cover === photo.filename ? 'Cover' : 'Set Cover'}
+            </button>
             <button className="btn btn-danger btn-sm" onClick={() => handleDelete(photo.filename)}>Delete</button>
           </div>
         ))}
@@ -174,6 +199,13 @@ export default function AdminImages() {
               <span className="stock-caption">{img.caption}</span>
               <span className="stock-badge">Stock</span>
             </div>
+            <button
+              className={`btn btn-sm ${cover === img.url ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => handleSetStockCover(img.url)}
+              title="Set as cover"
+            >
+              {cover === img.url ? 'Cover' : 'Set Cover'}
+            </button>
           </div>
         ))}
       </div>

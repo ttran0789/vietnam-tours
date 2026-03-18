@@ -532,7 +532,7 @@ def _load_tour_config(tour_slug: str) -> dict:
     if os.path.exists(config_file):
         with open(config_file) as f:
             return json.load(f)
-    return {"enabled": [], "disabled_stock": []}
+    return {"enabled": [], "disabled_stock": [], "cover": ""}
 
 
 def _save_tour_config(tour_slug: str, config: dict):
@@ -603,6 +603,7 @@ async def update_tour_photo_config(tour_slug: str, request: Request, admin: User
     _save_tour_config(tour_slug, {
         "enabled": data.get("enabled", []),
         "disabled_stock": data.get("disabled_stock", []),
+        "cover": data.get("cover", ""),
     })
     return {"detail": "Tour photo config updated"}
 
@@ -621,7 +622,10 @@ def get_tour_images(tour_slug: str):
         if os.path.exists(os.path.join(PHOTOS_DIR, f))
     ]
 
-    return {"uploaded": uploaded, "disabled_stock": disabled_stock}
+    cover = config.get("cover", "")
+    cover_url = f"/api/uploads/photos/{cover}" if cover and os.path.exists(os.path.join(PHOTOS_DIR, cover)) else ""
+
+    return {"uploaded": uploaded, "disabled_stock": disabled_stock, "cover": cover_url}
 
 
 # ── Stripe Payments ──────────────────────────────────────────────────────
