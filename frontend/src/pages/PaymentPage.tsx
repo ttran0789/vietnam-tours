@@ -75,6 +75,7 @@ export default function PaymentPage() {
   const [noStripe, setNoStripe] = useState(false)
   const [configChecked, setConfigChecked] = useState(false)
   const [booking, setBooking] = useState<any>(null)
+  const [bundledTransport, setBundledTransport] = useState<TransportBooking[]>([])
 
   // Load booking details
   useEffect(() => {
@@ -87,7 +88,18 @@ export default function PaymentPage() {
     } else {
       api.getBookings().then((data: any) => {
         const found = data.find((b: Booking) => b.id === Number(bookingId))
-        if (found) setBooking({ ...found, type: 'tour' })
+        if (found) {
+          setBooking({ ...found, type: 'tour' })
+          // Find bundled transport
+          api.getTransportBookings().then((tdata: any) => {
+            const bundled = tdata.filter((tb: TransportBooking) =>
+              tb.travel_date === found.start_date &&
+              tb.comments?.includes('Bundled with tour') &&
+              (tb.status === 'approved' || tb.status === 'pending')
+            )
+            setBundledTransport(bundled)
+          })
+        }
       })
     }
   }, [bookingId, bookingType])
@@ -144,27 +156,31 @@ export default function PaymentPage() {
             <h3>{t('payment.orderSummary')}</h3>
             {booking.type === 'tour' ? (
               <>
-                <div className="payment-summary-row">
-                  <span>{booking.tour?.name || 'Tour'}</span>
+                <div className="payment-summary-line">
+                  <span>
+                    {booking.tour?.name || 'Tour'}
+                    {booking.ride_type === 'easy_rider' ? ' (Easy Rider)' : ''}
+                    {booking.group_type === 'small' ? ' (Small Group)' : ''}
+                  </span>
                 </div>
                 <div className="payment-summary-detail">
                   <span>{t('bookings.date', { date: booking.start_date })}</span>
                   <span>{t('bookings.guests', { count: booking.num_guests })}</span>
                 </div>
-                {booking.ride_type === 'easy_rider' && (
-                  <div className="payment-summary-detail">
-                    <span>Easy Rider</span>
+
+                {bundledTransport.map(tb => (
+                  <div key={tb.id} className="payment-summary-line" style={{ marginTop: '0.75rem' }}>
+                    <span>
+                      {tb.route ? `${tb.route.origin} → ${tb.route.destination}` : 'Transport'}
+                      {tb.route ? ` (${tb.route.vehicle_type})` : ''}
+                    </span>
+                    <span>${tb.total_price.toFixed(2)}</span>
                   </div>
-                )}
-                {booking.group_type === 'small' && (
-                  <div className="payment-summary-detail">
-                    <span>Small Group</span>
-                  </div>
-                )}
+                ))}
               </>
             ) : (
               <>
-                <div className="payment-summary-row">
+                <div className="payment-summary-line">
                   <span>{booking.route ? `${booking.route.origin} → ${booking.route.destination}` : 'Transport'}</span>
                 </div>
                 <div className="payment-summary-detail">
