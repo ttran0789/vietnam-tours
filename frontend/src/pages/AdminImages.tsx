@@ -114,6 +114,20 @@ export default function AdminImages() {
 
   const stockImages = TOUR_IMAGES[selectedSlug] || []
 
+  const checkAll = () => {
+    const allEnabled = allPhotos.map(p => p.filename)
+    setEnabledFiles(allEnabled)
+    setDisabledStock([])
+    saveConfig(allEnabled, [], cover)
+  }
+
+  const uncheckAll = () => {
+    setEnabledFiles([])
+    setDisabledStock(stockImages.map(s => s.url))
+    saveConfig([], stockImages.map(s => s.url), '')
+    setCover('')
+  }
+
   return (
     <div className="container">
       <SEO title="Manage Photos" />
@@ -144,9 +158,15 @@ export default function AdminImages() {
         </label>
       </div>
 
-      <p className="admin-images-hint">
-        Check photos to show on this tour. {enabledFiles.length} uploaded + {stockImages.filter(s => !disabledStock.includes(s.url)).length} stock enabled.
-      </p>
+      <div className="admin-images-bar">
+        <p className="admin-images-hint">
+          {enabledFiles.length} uploaded + {stockImages.filter(s => !disabledStock.includes(s.url)).length} stock enabled
+        </p>
+        <div className="admin-images-bar-actions">
+          <button className="btn btn-outline btn-sm" onClick={checkAll}>Check All</button>
+          <button className="btn btn-outline btn-sm" onClick={uncheckAll}>Uncheck All</button>
+        </div>
+      </div>
 
       <div className="admin-images-list">
         {allPhotos.map(photo => (
