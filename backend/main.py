@@ -229,6 +229,30 @@ def admin_upcoming(admin: User = Depends(require_admin), db: Session = Depends(g
     return {"tours": tours, "transports": transports}
 
 
+# ── Admin Pricing ────────────────────────────────────────────────────────
+
+@app.put("/api/admin/tours/{tour_id}/price")
+async def update_tour_price(tour_id: int, request: Request, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    data = await request.json()
+    tour = db.query(Tour).filter(Tour.id == tour_id).first()
+    if not tour:
+        raise HTTPException(status_code=404, detail="Tour not found")
+    tour.price = float(data["price"])
+    db.commit()
+    return {"detail": "Price updated", "price": tour.price}
+
+
+@app.put("/api/admin/transport/{route_id}/price")
+async def update_transport_price(route_id: int, request: Request, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    data = await request.json()
+    route = db.query(TransportRoute).filter(TransportRoute.id == route_id).first()
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+    route.price = float(data["price"])
+    db.commit()
+    return {"detail": "Price updated", "price": route.price}
+
+
 # ── Tours ────────────────────────────────────────────────────────────────
 
 @app.get("/api/tours", response_model=list[TourResponse])
@@ -457,7 +481,11 @@ def create_transport_booking(
     route = db.query(TransportRoute).filter(TransportRoute.id == data.route_id).first()
     if not route:
         raise HTTPException(status_code=404, detail="Route not found")
-    total_price = route.price * data.num_passengers
+    # Private cars: flat rate. Buses: per person.
+    if route.vehicle_type == "Private Car":
+        total_price = route.price
+    else:
+        total_price = route.price * data.num_passengers
     auto_approve = is_instant_booking(data.travel_date)
     tb = TransportBooking(
         user_id=user.id,

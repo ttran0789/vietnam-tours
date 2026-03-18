@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../api'
-import { Tour, Review } from '../types'
+import { Tour, Review, TransportRoute } from '../types'
 import { useAuth } from '../context/AuthContext'
 import ReviewCard from '../components/ReviewCard'
 import PhotoGallery from '../components/PhotoGallery'
@@ -31,6 +31,9 @@ export default function TourDetail() {
   const [uploadedImages, setUploadedImages] = useState<{ url: string; caption: string }[]>([])
   const [disabledStock, setDisabledStock] = useState<string[]>([])
   const [coverUrl, setCoverUrl] = useState('')
+  const [transportRoutes, setTransportRoutes] = useState<TransportRoute[]>([])
+  const [selectedTransport, setSelectedTransport] = useState('')
+  const [pickup, setPickup] = useState('')
 
   useEffect(() => {
     if (slug) {
@@ -38,6 +41,15 @@ export default function TourDetail() {
         .then((data: any) => {
           setTour(data)
           api.getReviews(data.id).then((r: any) => setReviews(r))
+          api.getTransportRoutes().then((routes: any) => {
+            // Filter routes relevant to this tour's location
+            const location = data.location?.toLowerCase() || ''
+            const relevant = routes.filter((r: TransportRoute) =>
+              r.destination.toLowerCase().includes(location.split(',')[0].trim().toLowerCase()) ||
+              r.origin.toLowerCase().includes(location.split(',')[0].trim().toLowerCase())
+            )
+            setTransportRoutes(relevant.length > 0 ? relevant : routes)
+          })
           api.getTourImages(data.slug).then((result: any) => {
             setUploadedImages(result.uploaded || [])
             setDisabledStock(result.disabled_stock || [])
@@ -60,7 +72,20 @@ export default function TourDetail() {
     setBooking(true)
     setError('')
     try {
-      const res: any = await api.createBooking(tour!.id, startDate, numGuests, comments)
+      const transportComment = selectedTransport ? `\n[Transport add-on: ${selectedTransport}]` : ''
+      const fullComments = comments + transportComment
+
+      const res: any = await api.createBooking(tour!.id, startDate, numGuests, fullComments)
+
+      // Also create transport booking if selected
+      if (selectedTransport) {
+        const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === selectedTransport)
+        if (route) {
+          const passengers = route.vehicle_type === 'Private Car' ? Math.min(numGuests, 4) : numGuests
+          await api.createTransportBooking(route.id, startDate, passengers, `Bundled with tour: ${tour!.name}`, pickup)
+        }
+      }
+
       if (res.status === 'approved') {
         navigate(`/payment/${res.id}`)
       } else {
@@ -231,6 +256,28 @@ export default function TourDetail() {
                     </select>
                   </label>
 
+                  {transportRoutes.length > 0 && (
+                    <div className="transport-addon">
+                      <label>
+                        {t('tour.addTransport')}
+                        <select value={selectedTransport} onChange={e => setSelectedTransport(e.target.value)}>
+                          <option value="">{t('tour.noTransport')}</option>
+                          {transportRoutes.map(r => (
+                            <option key={r.id} value={`${r.origin} → ${r.destination} (${r.vehicle_type})`}>
+                              {r.origin} → {r.destination} — {r.vehicle_type} (${r.price}/person)
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      {selectedTransport && selectedTransport.includes('Private Car') && (
+                        <label>
+                          {t('transport.pickup')}
+                          <input type="text" value={pickup} onChange={e => setPickup(e.target.value)} placeholder={t('transport.pickupPlaceholder')} />
+                        </label>
+                      )}
+                    </div>
+                  )}
+
                   <label>
                     {t('tour.comments')}
                     <textarea
@@ -241,10 +288,29 @@ export default function TourDetail() {
                     />
                   </label>
 
-                  <div className="booking-total">
-                    <span>{t('tour.total')}</span>
-                    <span className="total-amount">${(tour.price * numGuests).toFixed(2)}</span>
-                  </div>
+                  {(() => {
+                    const transportRoute = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === selectedTransport)
+                    const transportCost = transportRoute ? transportRoute.price * (transportRoute.vehicle_type === 'Private Car' ? Math.min(numGuests, 4) : numGuests) : 0
+                    const tourTotal = tour.price * numGuests
+                    return (
+                      <div className="booking-total-section">
+                        <div className="booking-total-line">
+                          <span>{t('nav.tours')}</span>
+                          <span>${tourTotal.toFixed(2)}</span>
+                        </div>
+                        {transportCost > 0 && (
+                          <div className="booking-total-line">
+                            <span>{t('nav.transport')}</span>
+                            <span>${transportCost.toFixed(2)}</span>
+                          </div>
+                        )}
+                        <div className="booking-total">
+                          <span>{t('tour.total')}</span>
+                          <span className="total-amount">${(tourTotal + transportCost).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    )
+                  })()}
 
                   {error && <div className="error-message">{error}</div>}
 

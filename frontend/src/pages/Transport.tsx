@@ -41,7 +41,7 @@ export default function Transport() {
     setSubmitting(true)
     setError('')
     try {
-      const res: any = await api.createTransportBooking(selectedRoute.id, travelDate, numPassengers, comments, pickup)
+      const res: any = await api.createTransportBooking(selectedRoute.id, travelDate, 1, comments, pickup)
       if (res.status === 'approved') {
         navigate(`/payment/${res.id}?type=transport`)
       } else {
@@ -121,7 +121,7 @@ export default function Transport() {
 
                   <div className="booking-price">
                     <span className="price-amount">${selectedRoute.price}</span>
-                    <span className="price-unit">{t('transport.perPerson')}</span>
+                    <span className="price-unit">{selectedRoute.vehicle_type === 'Private Car' ? '/ up to 4 guests' : '/ person'}</span>
                   </div>
 
                   {success ? (
@@ -142,15 +142,6 @@ export default function Transport() {
                           onChange={e => setTravelDate(e.target.value)}
                           min={new Date().toISOString().split('T')[0]}
                         />
-                      </label>
-
-                      <label>
-                        {t('transport.passengers')}
-                        <select value={numPassengers} onChange={e => setNumPassengers(Number(e.target.value))}>
-                          {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
-                            <option key={n} value={n}>{n}</option>
-                          ))}
-                        </select>
                       </label>
 
                       <label>
@@ -175,7 +166,7 @@ export default function Transport() {
 
                       <div className="booking-total">
                         <span>{t('tour.total')}</span>
-                        <span className="total-amount">${(selectedRoute.price * numPassengers).toFixed(2)}</span>
+                        <span className="total-amount">${selectedRoute.price.toFixed(2)}</span>
                       </div>
 
                       {error && <div className="error-message">{error}</div>}

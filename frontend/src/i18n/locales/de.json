@@ -44,6 +44,8 @@
     "commentsPlaceholder": "Ernährungseinschränkungen, Reisegruppenvorlieben, besondere Wünsche...",
     "bookingNote": "Noch keine Zahlung erforderlich. Wir prüfen deine Anfrage und melden uns.",
     "instantNote": "Sofortbuchung! Du wirst direkt zur Zahlung weitergeleitet.",
+    "addTransport": "Transport Hinzufügen",
+    "noTransport": "Kein Transport nötig",
     "bookingSubmitted": "Anfrage Gesendet!",
     "bookingSubmittedDesc": "Wir prüfen deine Buchung und benachrichtigen dich nach Genehmigung. Dann kannst du zur Zahlung fortfahren."
   },

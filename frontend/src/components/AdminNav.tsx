@@ -5,6 +5,7 @@ const links = [
   { to: '/admin/upcoming', label: 'Upcoming' },
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/images', label: 'Photos' },
+  { to: '/admin/pricing', label: 'Pricing' },
 ]
 
 export default function AdminNav() {

@@ -44,6 +44,8 @@
     "commentsPlaceholder": "Food restrictions, travel group preferences, special requests...",
     "bookingNote": "No payment required now. We'll review your request and get back to you.",
     "instantNote": "Instant booking! You'll proceed to payment next.",
+    "addTransport": "Add Transportation",
+    "noTransport": "No transport needed",
     "bookingSubmitted": "Request Submitted!",
     "bookingSubmittedDesc": "We'll review your booking and notify you once approved. You can then proceed to payment."
   },

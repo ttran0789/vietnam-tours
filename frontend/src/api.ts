@@ -83,6 +83,12 @@ export const api = {
   getAdminUsers: () => request('/admin/users'),
   getAdminUpcoming: () => request('/admin/upcoming'),
 
+  updateTourPrice: (tourId: number, price: number) =>
+    request(`/admin/tours/${tourId}/price`, { method: 'PUT', body: JSON.stringify({ price }) }),
+
+  updateTransportPrice: (routeId: number, price: number) =>
+    request(`/admin/transport/${routeId}/price`, { method: 'PUT', body: JSON.stringify({ price }) }),
+
   getAdminBookings: (status?: string) =>
     request(`/admin/bookings${status ? `?status=${status}` : ''}`),
 
