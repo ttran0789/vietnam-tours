@@ -44,6 +44,14 @@ export default function MyBookings() {
 
   const isEmpty = bookings.length === 0 && transportBookings.length === 0
 
+  // Separate bundled vs standalone transport
+  const bundledTransport = transportBookings.filter(tb => tb.comments?.includes('Bundled with tour'))
+  const standaloneTransport = transportBookings.filter(tb => !tb.comments?.includes('Bundled with tour'))
+
+  // Get bundled transport for a specific tour booking
+  const getBundledFor = (booking: Booking) =>
+    bundledTransport.filter(tb => tb.travel_date === booking.start_date)
+
   return (
     <div className="container">
       <SEO title="My Bookings" />
@@ -60,50 +68,68 @@ export default function MyBookings() {
           {bookings.length > 0 && (
             <>
               <h2 className="bookings-subheader">{t('nav.tours')}</h2>
-              {bookings.map(booking => (
-                <div key={`tour-${booking.id}`} className="booking-item">
-                  <div className="booking-item-info">
-                    <h3>
-                      {booking.tour?.name || `Tour #${booking.tour_id}`}
-                      {booking.ride_type === 'easy_rider' && <span className="booking-vehicle-badge">Easy Rider</span>}
-                      {booking.group_type === 'small' && <span className="booking-vehicle-badge">Small Group</span>}
-                    </h3>
-                    <div className="booking-item-details">
-                      <span>{t('bookings.date', { date: booking.start_date })}</span>
-                      <span>{t('bookings.guests', { count: booking.num_guests })}</span>
-                      <span>{t('bookings.total', { amount: booking.total_price.toFixed(2) })}</span>
+              {bookings.map(booking => {
+                const bundled = getBundledFor(booking)
+                return (
+                  <div key={`tour-${booking.id}`} className="booking-item">
+                    <div className="booking-item-info">
+                      <h3>
+                        {booking.tour?.name || `Tour #${booking.tour_id}`}
+                        {booking.ride_type === 'easy_rider' && <span className="booking-vehicle-badge">Easy Rider</span>}
+                        {booking.group_type === 'small' && <span className="booking-vehicle-badge">Small Group</span>}
+                      </h3>
+                      <div className="booking-item-details">
+                        <span>{t('bookings.date', { date: booking.start_date })}</span>
+                        <span>{t('bookings.guests', { count: booking.num_guests })}</span>
+                        <span>{t('bookings.total', { amount: booking.total_price.toFixed(2) })}</span>
+                      </div>
+
+                      {bundled.length > 0 && (
+                        <div className="bundled-transport">
+                          {bundled.map(tb => (
+                            <div key={tb.id} className="bundled-transport-item">
+                              <span>
+                                {tb.route ? `${tb.route.origin} → ${tb.route.destination}` : 'Transport'}
+                                {tb.route && ` (${tb.route.vehicle_type})`}
+                              </span>
+                              <span>${tb.total_price.toFixed(2)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <span className={`status-badge ${STATUS_STYLES[booking.status] || ''}`}>
+                        {t(`bookings.status.${booking.status}`)}
+                      </span>
+                      {booking.comments && (
+                        <p className="booking-comments">{t('bookings.yourComments')}: {booking.comments}</p>
+                      )}
+                      {booking.admin_notes && (
+                        <p className="booking-admin-notes">{t('bookings.adminNotes')}: {booking.admin_notes}</p>
+                      )}
                     </div>
-                    <span className={`status-badge ${STATUS_STYLES[booking.status] || ''}`}>
-                      {t(`bookings.status.${booking.status}`)}
-                    </span>
-                    {booking.comments && (
-                      <p className="booking-comments">{t('bookings.yourComments')}: {booking.comments}</p>
-                    )}
-                    {booking.admin_notes && (
-                      <p className="booking-admin-notes">{t('bookings.adminNotes')}: {booking.admin_notes}</p>
-                    )}
+                    <div className="booking-item-actions">
+                      {booking.status === 'approved' && (
+                        <Link to={`/payment/${booking.id}`} className="btn btn-primary btn-sm">
+                          {t('bookings.payNow')}
+                        </Link>
+                      )}
+                      {(booking.status === 'pending' || booking.status === 'approved') && (
+                        <button onClick={() => handleCancelTour(booking.id)} className="btn btn-outline btn-sm">
+                          {t('bookings.cancel')}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="booking-item-actions">
-                    {booking.status === 'approved' && (
-                      <Link to={`/payment/${booking.id}`} className="btn btn-primary btn-sm">
-                        {t('bookings.payNow')}
-                      </Link>
-                    )}
-                    {(booking.status === 'pending' || booking.status === 'approved') && (
-                      <button onClick={() => handleCancelTour(booking.id)} className="btn btn-outline btn-sm">
-                        {t('bookings.cancel')}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </>
           )}
 
-          {transportBookings.length > 0 && (
+          {standaloneTransport.length > 0 && (
             <>
               <h2 className="bookings-subheader">{t('nav.transport')}</h2>
-              {transportBookings.map(tb => (
+              {standaloneTransport.map(tb => (
                 <div key={`transport-${tb.id}`} className="booking-item">
                   <div className="booking-item-info">
                     <h3>{tb.route ? `${tb.route.origin} → ${tb.route.destination}` : `Route #${tb.route_id}`}
@@ -111,7 +137,6 @@ export default function MyBookings() {
                     </h3>
                     <div className="booking-item-details">
                       <span>{t('bookings.date', { date: tb.travel_date })}</span>
-                      <span>{t('transport.passengersCount', { count: tb.num_passengers })}</span>
                       <span>{t('bookings.total', { amount: tb.total_price.toFixed(2) })}</span>
                     </div>
                     {tb.pickup_location && (
