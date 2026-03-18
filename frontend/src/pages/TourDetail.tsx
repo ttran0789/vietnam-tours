@@ -290,7 +290,7 @@ export default function TourDetail() {
 
                   {(() => {
                     const transportRoute = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === selectedTransport)
-                    const transportCost = transportRoute ? transportRoute.price * (transportRoute.vehicle_type === 'Private Car' ? Math.min(numGuests, 4) : numGuests) : 0
+                    const transportCost = transportRoute ? (transportRoute.vehicle_type === 'Private Car' ? transportRoute.price : transportRoute.price * numGuests) : 0
                     const tourTotal = tour.price * numGuests
                     return (
                       <div className="booking-total-section">
