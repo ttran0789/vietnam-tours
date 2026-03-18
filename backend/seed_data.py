@@ -276,7 +276,7 @@ def seed():
             # Hanoi <-> Sapa
             TransportRoute(origin="Hanoi", destination="Sapa", slug="hanoi-to-sapa-car",
                 description="Private car transfer from Hanoi to Sapa town center. Scenic drive through the Hoang Lien Son mountain range with an experienced driver.",
-                price=180.00, duration="5-6 hours", vehicle_type="Private Car",
+                price=200.00, duration="5-6 hours", vehicle_type="Private Car",
                 included=json.dumps(["Private vehicle with driver", "Door-to-door pickup and drop-off", "Air conditioning", "Bottled water", "Flexible departure time"])),
             TransportRoute(origin="Hanoi", destination="Sapa", slug="hanoi-to-sapa-bus",
                 description="Limousine sleeper bus from Hanoi to Sapa town center. Modern vehicle with spacious sleeper seats and charging ports.",
@@ -284,7 +284,7 @@ def seed():
                 included=json.dumps(["Reclining sleeper seat", "Blanket & pillow", "Bottled water", "WiFi on board", "Hotel pickup in Hanoi", "Drop-off at Sapa town center"])),
             TransportRoute(origin="Sapa", destination="Hanoi", slug="sapa-to-hanoi-car",
                 description="Private car transfer from Sapa town center back to Hanoi. Comfortable ride through the mountains with an experienced driver.",
-                price=180.00, duration="5-6 hours", vehicle_type="Private Car",
+                price=200.00, duration="5-6 hours", vehicle_type="Private Car",
                 included=json.dumps(["Private vehicle with driver", "Door-to-door pickup and drop-off", "Air conditioning", "Bottled water", "Flexible departure time"])),
             TransportRoute(origin="Sapa", destination="Hanoi", slug="sapa-to-hanoi-bus",
                 description="Return limousine sleeper bus from Sapa to Hanoi Old Quarter.",
