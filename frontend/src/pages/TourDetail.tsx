@@ -297,27 +297,29 @@ export default function TourDetail() {
                     </div>
                   )}
 
-                  <div className="ride-type-selector">
-                    <label>{t('tour.groupSize')}</label>
-                    <div className="ride-type-options">
-                      <button
-                        type="button"
-                        className={`ride-type-btn ${groupType === 'regular' ? 'ride-type-active' : ''}`}
-                        onClick={() => { setGroupType('regular'); if (numGuests > tour.max_group_size) setNumGuests(tour.max_group_size) }}
-                      >
-                        <strong>{t('tour.regularGroup')}</strong>
-                        <span>{t('tour.regularGroupDesc', { max: tour.max_group_size })}</span>
-                      </button>
-                      <button
-                        type="button"
-                        className={`ride-type-btn ${groupType === 'small' ? 'ride-type-active' : ''}`}
-                        onClick={() => { setGroupType('small'); if (numGuests > 5) setNumGuests(5) }}
-                      >
-                        <strong>{t('tour.smallGroup')}</strong>
-                        <span>{t('tour.smallGroupDesc')}</span>
-                      </button>
+                  {!tour.slug.includes('jeep') && (
+                    <div className="ride-type-selector">
+                      <label>{t('tour.groupSize')}</label>
+                      <div className="ride-type-options">
+                        <button
+                          type="button"
+                          className={`ride-type-btn ${groupType === 'regular' ? 'ride-type-active' : ''}`}
+                          onClick={() => { setGroupType('regular'); if (numGuests > tour.max_group_size) setNumGuests(tour.max_group_size) }}
+                        >
+                          <strong>{t('tour.regularGroup')}</strong>
+                          <span>{t('tour.regularGroupDesc', { max: tour.max_group_size })}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={`ride-type-btn ${groupType === 'small' ? 'ride-type-active' : ''}`}
+                          onClick={() => { setGroupType('small'); if (numGuests > 5) setNumGuests(5) }}
+                        >
+                          <strong>{t('tour.smallGroup')}</strong>
+                          <span>{t('tour.smallGroupDesc')}</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {transportRoutes.length > 0 && (() => {
                     const location = tour.location?.split(',')[0].trim().toLowerCase() || ''
