@@ -156,6 +156,79 @@ def change_password(
     return {"detail": "Password changed successfully"}
 
 
+# ── Admin Users ──────────────────────────────────────────────────────────
+
+@app.get("/api/admin/users")
+def admin_list_users(admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    users = db.query(User).order_by(User.created_at.desc()).all()
+    return [
+        {
+            "id": u.id,
+            "email": u.email,
+            "name": u.name,
+            "phone": u.phone or "",
+            "whatsapp": u.whatsapp or "",
+            "zalo": u.zalo or "",
+            "nationality": u.nationality or "",
+            "is_admin": u.is_admin,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+            "tour_bookings": db.query(Booking).filter(Booking.user_id == u.id).count(),
+            "transport_bookings": db.query(TransportBooking).filter(TransportBooking.user_id == u.id).count(),
+        }
+        for u in users
+    ]
+
+
+@app.get("/api/admin/upcoming")
+def admin_upcoming(admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    from datetime import datetime, timezone
+    today = datetime.now(timezone(timedelta(hours=7))).strftime("%Y-%m-%d")
+
+    tour_bookings = (
+        db.query(Booking)
+        .filter(Booking.start_date >= today)
+        .filter(Booking.status.in_([BookingStatus.PENDING, BookingStatus.APPROVED, BookingStatus.CONFIRMED]))
+        .order_by(Booking.start_date.asc())
+        .all()
+    )
+
+    transport_bookings = (
+        db.query(TransportBooking)
+        .filter(TransportBooking.travel_date >= today)
+        .filter(TransportBooking.status.in_([BookingStatus.PENDING, BookingStatus.APPROVED, BookingStatus.CONFIRMED]))
+        .order_by(TransportBooking.travel_date.asc())
+        .all()
+    )
+
+    tours = []
+    for b in tour_bookings:
+        user = db.query(User).filter(User.id == b.user_id).first()
+        tour = db.query(Tour).filter(Tour.id == b.tour_id).first()
+        tours.append({
+            "id": b.id, "type": "tour", "date": b.start_date, "status": b.status,
+            "num_guests": b.num_guests, "total_price": b.total_price, "comments": b.comments or "",
+            "customer_name": user.name if user else "", "customer_email": user.email if user else "",
+            "customer_phone": user.phone or "" if user else "", "customer_whatsapp": user.whatsapp or "" if user else "",
+            "tour_name": tour.name if tour else "",
+        })
+
+    transports = []
+    for b in transport_bookings:
+        user = db.query(User).filter(User.id == b.user_id).first()
+        route = db.query(TransportRoute).filter(TransportRoute.id == b.route_id).first()
+        transports.append({
+            "id": b.id, "type": "transport", "date": b.travel_date, "status": b.status,
+            "num_passengers": b.num_passengers, "total_price": b.total_price,
+            "comments": b.comments or "", "pickup_location": b.pickup_location or "",
+            "customer_name": user.name if user else "", "customer_email": user.email if user else "",
+            "customer_phone": user.phone or "" if user else "", "customer_whatsapp": user.whatsapp or "" if user else "",
+            "route_name": f"{route.origin} → {route.destination}" if route else "",
+            "vehicle_type": route.vehicle_type if route else "",
+        })
+
+    return {"tours": tours, "transports": transports}
+
+
 # ── Tours ────────────────────────────────────────────────────────────────
 
 @app.get("/api/tours", response_model=list[TourResponse])

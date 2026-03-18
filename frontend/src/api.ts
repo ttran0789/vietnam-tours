@@ -80,6 +80,8 @@ export const api = {
 
   // Admin
   getAdminStats: () => request('/admin/stats'),
+  getAdminUsers: () => request('/admin/users'),
+  getAdminUpcoming: () => request('/admin/upcoming'),
 
   getAdminBookings: (status?: string) =>
     request(`/admin/bookings${status ? `?status=${status}` : ''}`),

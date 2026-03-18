@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { api } from '../api'
 import { Booking, TransportBooking } from '../types'
 import SEO from '../components/SEO'
+import AdminNav from '../components/AdminNav'
 
 interface Stats {
   total_customers: number
@@ -78,6 +79,7 @@ export default function AdminBookings() {
 
   return (
     <div className="container">
+      <AdminNav />
       <SEO title="Admin Dashboard" />
       <h1 className="page-title">{t('admin.title')}</h1>
 

@@ -3,6 +3,7 @@ import { api } from '../api'
 import { Tour } from '../types'
 import { TOUR_IMAGES } from '../data/tourImages'
 import SEO from '../components/SEO'
+import AdminNav from '../components/AdminNav'
 
 interface Photo {
   url: string
@@ -130,6 +131,7 @@ export default function AdminImages() {
 
   return (
     <div className="container">
+      <AdminNav />
       <SEO title="Manage Photos" />
       <h1 className="page-title">Manage Photos</h1>
 
