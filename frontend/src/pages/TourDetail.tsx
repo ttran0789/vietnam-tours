@@ -100,11 +100,7 @@ export default function TourDetail() {
         }
       }
 
-      if (res.status === 'approved') {
-        navigate(`/payment/${res.id}`)
-      } else {
-        navigate('/booking-confirmed')
-      }
+      navigate('/booking-confirmed')
     } catch (e: any) {
       setError(e.message)
     } finally {

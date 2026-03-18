@@ -42,11 +42,7 @@ export default function Transport() {
     setError('')
     try {
       const res: any = await api.createTransportBooking(selectedRoute.id, travelDate, 1, comments, pickup)
-      if (res.status === 'approved') {
-        navigate(`/payment/${res.id}?type=transport`)
-      } else {
-        navigate('/booking-confirmed')
-      }
+      navigate('/booking-confirmed')
     } catch (e: any) {
       setError(e.message)
     } finally {
