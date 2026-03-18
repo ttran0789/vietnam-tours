@@ -129,12 +129,10 @@ export const api = {
   getTourImages: (tourSlug: string) =>
     request(`/images/${tourSlug}`),
 
-  getAdminTourImages: (tourSlug: string) =>
-    request(`/admin/images/${tourSlug}`),
+  getAllPhotos: () => request('/admin/photos'),
 
-  uploadTourImage: (tourSlug: string, file: File) => {
+  uploadPhoto: (file: File) => {
     const formData = new FormData()
-    formData.append('tour_slug', tourSlug)
     formData.append('file', file)
     const token = localStorage.getItem('token')
     return fetch('/api/admin/upload', {
@@ -147,11 +145,20 @@ export const api = {
     })
   },
 
-  updateImageCaption: (tourSlug: string, filename: string, caption: string) =>
-    request(`/admin/images/${tourSlug}/${filename}/caption?caption=${encodeURIComponent(caption)}`, { method: 'PUT' }),
+  updatePhotoCaption: (filename: string, caption: string) =>
+    request(`/admin/photos/${filename}/caption?caption=${encodeURIComponent(caption)}`, { method: 'PUT' }),
 
-  deleteTourImage: (tourSlug: string, filename: string) =>
-    request(`/admin/images/${tourSlug}/${filename}`, { method: 'DELETE' }),
+  deletePhoto: (filename: string) =>
+    request(`/admin/photos/${filename}`, { method: 'DELETE' }),
+
+  getTourPhotoConfig: (tourSlug: string) =>
+    request(`/admin/tour-photos/${tourSlug}`),
+
+  updateTourPhotoConfig: (tourSlug: string, enabled: string[], disabledStock: string[]) =>
+    request(`/admin/tour-photos/${tourSlug}`, {
+      method: 'PUT',
+      body: JSON.stringify({ enabled, disabled_stock: disabledStock }),
+    }),
 
   createPaymentIntent: (bookingId: number, bookingType: string = 'tour') =>
     request<{ client_secret: string }>('/payments/create-intent', {

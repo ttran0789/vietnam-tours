@@ -506,166 +506,122 @@ def reject_transport_booking(
 
 # ── Image Uploads ────────────────────────────────────────────────────────
 
+import uuid
+
+# Shared photo pool config
+PHOTOS_DIR = os.path.join(UPLOAD_DIR, "photos")
+os.makedirs(PHOTOS_DIR, exist_ok=True)
+CAPTIONS_FILE = os.path.join(UPLOAD_DIR, "captions.json")
+
+
+def _load_captions() -> dict:
+    if os.path.exists(CAPTIONS_FILE):
+        with open(CAPTIONS_FILE) as f:
+            return json.load(f)
+    return {}
+
+
+def _save_captions(captions: dict):
+    with open(CAPTIONS_FILE, "w") as f:
+        json.dump(captions, f)
+
+
+def _load_tour_config(tour_slug: str) -> dict:
+    """Load per-tour config: which photos are enabled + disabled stock."""
+    config_file = os.path.join(UPLOAD_DIR, f"{tour_slug}.json")
+    if os.path.exists(config_file):
+        with open(config_file) as f:
+            return json.load(f)
+    return {"enabled": [], "disabled_stock": []}
+
+
+def _save_tour_config(tour_slug: str, config: dict):
+    with open(os.path.join(UPLOAD_DIR, f"{tour_slug}.json"), "w") as f:
+        json.dump(config, f)
+
+
 @app.post("/api/admin/upload")
 async def upload_image(
-    tour_slug: str = Form(...),
     file: UploadFile = File(...),
     admin: User = Depends(require_admin),
 ):
     if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    # Create tour directory
-    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
-    os.makedirs(tour_dir, exist_ok=True)
-
-    # Save with unique name
-    import uuid
     ext = file.filename.split(".")[-1] if file.filename and "." in file.filename else "jpg"
     filename = f"{uuid.uuid4().hex[:8]}.{ext}"
-    filepath = os.path.join(tour_dir, filename)
+    filepath = os.path.join(PHOTOS_DIR, filename)
 
     content = await file.read()
     with open(filepath, "wb") as f:
         f.write(content)
 
-    return {"url": f"/api/uploads/{tour_slug}/{filename}", "filename": filename, "caption": ""}
+    return {"url": f"/api/uploads/photos/{filename}", "filename": filename, "caption": ""}
 
 
-def _load_captions(tour_slug: str) -> dict:
-    caption_file = os.path.join(UPLOAD_DIR, tour_slug, "captions.json")
-    if os.path.exists(caption_file):
-        with open(caption_file) as f:
-            return json.load(f)
-    return {}
-
-
-def _save_captions(tour_slug: str, captions: dict):
-    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
-    os.makedirs(tour_dir, exist_ok=True)
-    with open(os.path.join(tour_dir, "captions.json"), "w") as f:
-        json.dump(captions, f)
-
-
-def _list_images(tour_slug: str) -> list:
-    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
-    if not os.path.exists(tour_dir):
+@app.get("/api/admin/photos")
+def list_all_photos(admin: User = Depends(require_admin)):
+    """List all uploaded photos in the shared pool."""
+    if not os.path.exists(PHOTOS_DIR):
         return []
-    captions = _load_captions(tour_slug)
-    files = sorted(f for f in os.listdir(tour_dir) if not f.startswith(".") and f != "captions.json")
-    return [{"url": f"/api/uploads/{tour_slug}/{f}", "filename": f, "caption": captions.get(f, "")} for f in files]
+    captions = _load_captions()
+    files = sorted(f for f in os.listdir(PHOTOS_DIR) if not f.startswith("."))
+    return [{"url": f"/api/uploads/photos/{f}", "filename": f, "caption": captions.get(f, "")} for f in files]
 
 
-@app.get("/api/admin/images/{tour_slug}")
-def list_tour_images(tour_slug: str, admin: User = Depends(require_admin)):
-    return _list_images(tour_slug)
-
-
-@app.put("/api/admin/images/{tour_slug}/{filename}/caption")
-def update_image_caption(
-    tour_slug: str,
-    filename: str,
-    admin: User = Depends(require_admin),
-    caption: str = "",
-):
-    filepath = os.path.join(UPLOAD_DIR, tour_slug, filename)
+@app.put("/api/admin/photos/{filename}/caption")
+def update_photo_caption(filename: str, caption: str = "", admin: User = Depends(require_admin)):
+    filepath = os.path.join(PHOTOS_DIR, filename)
     if not os.path.exists(filepath):
-        raise HTTPException(status_code=404, detail="Image not found")
-    captions = _load_captions(tour_slug)
+        raise HTTPException(status_code=404, detail="Photo not found")
+    captions = _load_captions()
     captions[filename] = caption
-    _save_captions(tour_slug, captions)
+    _save_captions(captions)
     return {"detail": "Caption updated"}
 
 
-@app.delete("/api/admin/images/{tour_slug}/{filename}")
-def delete_tour_image(tour_slug: str, filename: str, admin: User = Depends(require_admin)):
-    filepath = os.path.join(UPLOAD_DIR, tour_slug, filename)
+@app.delete("/api/admin/photos/{filename}")
+def delete_photo(filename: str, admin: User = Depends(require_admin)):
+    filepath = os.path.join(PHOTOS_DIR, filename)
     if not os.path.exists(filepath):
-        raise HTTPException(status_code=404, detail="Image not found")
+        raise HTTPException(status_code=404, detail="Photo not found")
     os.remove(filepath)
-    # Remove caption
-    captions = _load_captions(tour_slug)
+    captions = _load_captions()
     captions.pop(filename, None)
-    _save_captions(tour_slug, captions)
-    return {"detail": "Image deleted"}
+    _save_captions(captions)
+    return {"detail": "Photo deleted"}
 
 
-@app.get("/api/admin/images/{tour_slug}/stock-config")
-def get_stock_config(tour_slug: str, admin: User = Depends(require_admin)):
-    config_file = os.path.join(UPLOAD_DIR, tour_slug, "stock_config.json")
-    if os.path.exists(config_file):
-        with open(config_file) as f:
-            return json.load(f)
-    return {"disabled": []}
+@app.get("/api/admin/tour-photos/{tour_slug}")
+def get_tour_photo_config(tour_slug: str, admin: User = Depends(require_admin)):
+    return _load_tour_config(tour_slug)
 
 
-@app.put("/api/admin/images/{tour_slug}/stock-config")
-async def update_stock_config(
-    tour_slug: str,
-    request: Request,
-    admin: User = Depends(require_admin),
-):
+@app.put("/api/admin/tour-photos/{tour_slug}")
+async def update_tour_photo_config(tour_slug: str, request: Request, admin: User = Depends(require_admin)):
     data = await request.json()
-    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
-    os.makedirs(tour_dir, exist_ok=True)
-    with open(os.path.join(tour_dir, "stock_config.json"), "w") as f:
-        json.dump({"disabled": data.get("disabled", [])}, f)
-    return {"detail": "Stock config updated"}
-
-
-@app.get("/api/admin/images/{tour_slug}/shared")
-def get_shared_config(tour_slug: str, admin: User = Depends(require_admin)):
-    config_file = os.path.join(UPLOAD_DIR, tour_slug, "shared_from.json")
-    if os.path.exists(config_file):
-        with open(config_file) as f:
-            return json.load(f)
-    return {"shared_from": ""}
-
-
-@app.put("/api/admin/images/{tour_slug}/shared")
-async def update_shared_config(
-    tour_slug: str,
-    request: Request,
-    admin: User = Depends(require_admin),
-):
-    data = await request.json()
-    tour_dir = os.path.join(UPLOAD_DIR, tour_slug)
-    os.makedirs(tour_dir, exist_ok=True)
-    with open(os.path.join(tour_dir, "shared_from.json"), "w") as f:
-        json.dump({"shared_from": data.get("shared_from", "")}, f)
-    return {"detail": "Shared config updated"}
+    _save_tour_config(tour_slug, {
+        "enabled": data.get("enabled", []),
+        "disabled_stock": data.get("disabled_stock", []),
+    })
+    return {"detail": "Tour photo config updated"}
 
 
 @app.get("/api/images/{tour_slug}")
 def get_tour_images(tour_slug: str):
-    """Public endpoint — returns uploaded images (own + shared) + disabled stock."""
-    # Check if this tour shares photos from another tour
-    shared_slug = ""
-    shared_file = os.path.join(UPLOAD_DIR, tour_slug, "shared_from.json")
-    if os.path.exists(shared_file):
-        with open(shared_file) as f:
-            shared_slug = json.load(f).get("shared_from", "")
+    """Public endpoint — returns enabled uploaded + enabled stock photos for a tour."""
+    config = _load_tour_config(tour_slug)
+    enabled_filenames = config.get("enabled", [])
+    disabled_stock = config.get("disabled_stock", [])
 
-    # Own uploads
-    uploaded = _list_images(tour_slug)
-    # Shared uploads (if configured and has no own uploads)
-    if not uploaded and shared_slug:
-        uploaded = _list_images(shared_slug)
-    # If has own uploads, also add shared ones
-    elif uploaded and shared_slug:
-        shared = _list_images(shared_slug)
-        # Avoid duplicates
-        own_filenames = {img["filename"] for img in uploaded}
-        uploaded += [img for img in shared if img["filename"] not in own_filenames]
+    captions = _load_captions()
+    uploaded = [
+        {"url": f"/api/uploads/photos/{f}", "filename": f, "caption": captions.get(f, "")}
+        for f in enabled_filenames
+        if os.path.exists(os.path.join(PHOTOS_DIR, f))
+    ]
 
-    # Load disabled stock list
-    config_file = os.path.join(UPLOAD_DIR, tour_slug, "stock_config.json")
-    disabled = []
-    if os.path.exists(config_file):
-        with open(config_file) as f:
-            disabled = json.load(f).get("disabled", [])
-
-    return {"uploaded": uploaded, "disabled_stock": disabled}
+    return {"uploaded": uploaded, "disabled_stock": disabled_stock}
 
 
 # ── Stripe Payments ──────────────────────────────────────────────────────
