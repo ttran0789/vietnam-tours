@@ -33,6 +33,7 @@ export interface Booking {
   num_guests: number
   total_price: number
   status: string
+  ride_type: string
   comments: string
   admin_notes: string
   stripe_payment_intent_id: string | null

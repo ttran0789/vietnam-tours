@@ -46,6 +46,12 @@
     "instantNote": "Instant booking! You'll proceed to payment next.",
     "addTransport": "Add Transportation",
     "noTransport": "No transport needed",
+    "rideType": "Ride Option",
+    "selfRide": "Self-Ride",
+    "easyRider": "Easy Rider",
+    "easyRiderDesc": "Sit back and enjoy — an experienced rider drives while you take in the views.",
+    "transportTo": "Getting There",
+    "transportFrom": "Getting Back",
     "bookingSubmitted": "Request Submitted!",
     "bookingSubmittedDesc": "We'll review your booking and notify you once approved. You can then proceed to payment."
   },

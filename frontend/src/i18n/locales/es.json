@@ -46,6 +46,12 @@
     "instantNote": "¡Reserva instantánea! Procederás al pago a continuación.",
     "addTransport": "Agregar Transporte",
     "noTransport": "No necesito transporte",
+    "rideType": "Tipo de Viaje",
+    "selfRide": "Conducir",
+    "easyRider": "Easy Rider",
+    "easyRiderDesc": "Relájate y disfruta — un conductor experimentado maneja mientras tú disfrutas las vistas.",
+    "transportTo": "Ida",
+    "transportFrom": "Vuelta",
     "bookingSubmitted": "¡Solicitud Enviada!",
     "bookingSubmittedDesc": "Revisaremos tu reserva y te notificaremos una vez aprobada. Luego podrás proceder al pago."
   },

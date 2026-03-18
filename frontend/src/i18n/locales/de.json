@@ -46,6 +46,12 @@
     "instantNote": "Sofortbuchung! Du wirst direkt zur Zahlung weitergeleitet.",
     "addTransport": "Transport Hinzufügen",
     "noTransport": "Kein Transport nötig",
+    "rideType": "Fahroption",
+    "selfRide": "Selbst Fahren",
+    "easyRider": "Easy Rider",
+    "easyRiderDesc": "Lehn dich zurück — ein erfahrener Fahrer fährt, während du die Aussicht genießt.",
+    "transportTo": "Hinfahrt",
+    "transportFrom": "Rückfahrt",
     "bookingSubmitted": "Anfrage Gesendet!",
     "bookingSubmittedDesc": "Wir prüfen deine Buchung und benachrichtigen dich nach Genehmigung. Dann kannst du zur Zahlung fortfahren."
   },

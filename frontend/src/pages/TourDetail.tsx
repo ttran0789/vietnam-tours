@@ -32,7 +32,9 @@ export default function TourDetail() {
   const [disabledStock, setDisabledStock] = useState<string[]>([])
   const [coverUrl, setCoverUrl] = useState('')
   const [transportRoutes, setTransportRoutes] = useState<TransportRoute[]>([])
-  const [selectedTransport, setSelectedTransport] = useState('')
+  const [rideType, setRideType] = useState('self')
+  const [transportTo, setTransportTo] = useState('')
+  const [transportFrom, setTransportFrom] = useState('')
   const [pickup, setPickup] = useState('')
 
   useEffect(() => {
@@ -72,17 +74,22 @@ export default function TourDetail() {
     setBooking(true)
     setError('')
     try {
-      const transportComment = selectedTransport ? `\n[Transport add-on: ${selectedTransport}]` : ''
+      const transportParts = []
+      if (transportTo) transportParts.push(`To: ${transportTo}`)
+      if (transportFrom) transportParts.push(`Return: ${transportFrom}`)
+      const transportComment = transportParts.length > 0 ? `\n[Transport: ${transportParts.join(', ')}]` : ''
       const fullComments = comments + transportComment
 
-      const res: any = await api.createBooking(tour!.id, startDate, numGuests, fullComments)
+      const res: any = await api.createBooking(tour!.id, startDate, numGuests, fullComments, rideType)
 
-      // Also create transport booking if selected
-      if (selectedTransport) {
-        const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === selectedTransport)
-        if (route) {
-          const passengers = route.vehicle_type === 'Private Car' ? Math.min(numGuests, 4) : numGuests
-          await api.createTransportBooking(route.id, startDate, passengers, `Bundled with tour: ${tour!.name}`, pickup)
+      // Create transport bookings if selected
+      for (const selected of [transportTo, transportFrom]) {
+        if (selected) {
+          const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === selected)
+          if (route) {
+            const passengers = route.vehicle_type === 'Private Car' ? 1 : numGuests
+            await api.createTransportBooking(route.id, startDate, passengers, `Bundled with tour: ${tour!.name}`, pickup)
+          }
         }
       }
 
@@ -256,27 +263,75 @@ export default function TourDetail() {
                     </select>
                   </label>
 
-                  {transportRoutes.length > 0 && (
-                    <div className="transport-addon">
-                      <label>
-                        {t('tour.addTransport')}
-                        <select value={selectedTransport} onChange={e => setSelectedTransport(e.target.value)}>
-                          <option value="">{t('tour.noTransport')}</option>
-                          {transportRoutes.map(r => (
-                            <option key={r.id} value={`${r.origin} → ${r.destination} (${r.vehicle_type})`}>
-                              {r.origin} → {r.destination} — {r.vehicle_type} (${r.price}/person)
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      {selectedTransport && selectedTransport.includes('Private Car') && (
-                        <label>
-                          {t('transport.pickup')}
-                          <input type="text" value={pickup} onChange={e => setPickup(e.target.value)} placeholder={t('transport.pickupPlaceholder')} />
-                        </label>
-                      )}
+                  <div className="ride-type-selector">
+                    <label>{t('tour.rideType')}</label>
+                    <div className="ride-type-options">
+                      <button
+                        type="button"
+                        className={`ride-type-btn ${rideType === 'self' ? 'ride-type-active' : ''}`}
+                        onClick={() => setRideType('self')}
+                      >
+                        <strong>{t('tour.selfRide')}</strong>
+                        <span>${tour.price}/person</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`ride-type-btn ${rideType === 'easy_rider' ? 'ride-type-active' : ''}`}
+                        onClick={() => setRideType('easy_rider')}
+                      >
+                        <strong>{t('tour.easyRider')}</strong>
+                        <span>${(tour.price * 1.2).toFixed(0)}/person</span>
+                      </button>
                     </div>
-                  )}
+                    {rideType === 'easy_rider' && (
+                      <p className="ride-type-note">{t('tour.easyRiderDesc')}</p>
+                    )}
+                  </div>
+
+                  {transportRoutes.length > 0 && (() => {
+                    const location = tour.location?.split(',')[0].trim().toLowerCase() || ''
+                    const toRoutes = transportRoutes.filter(r => r.destination.toLowerCase().includes(location))
+                    const fromRoutes = transportRoutes.filter(r => r.origin.toLowerCase().includes(location))
+                    const needsPickup = (transportTo + transportFrom).includes('Private Car')
+
+                    return (
+                      <div className="transport-addon">
+                        <label className="transport-addon-title">{t('tour.addTransport')}</label>
+                        {toRoutes.length > 0 && (
+                          <label>
+                            {t('tour.transportTo')}
+                            <select value={transportTo} onChange={e => setTransportTo(e.target.value)}>
+                              <option value="">{t('tour.noTransport')}</option>
+                              {toRoutes.map(r => (
+                                <option key={r.id} value={`${r.origin} → ${r.destination} (${r.vehicle_type})`}>
+                                  {r.origin} → {r.destination} — {r.vehicle_type} (${r.price}{r.vehicle_type === 'Private Car' ? '/car' : '/person'})
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        )}
+                        {fromRoutes.length > 0 && (
+                          <label>
+                            {t('tour.transportFrom')}
+                            <select value={transportFrom} onChange={e => setTransportFrom(e.target.value)}>
+                              <option value="">{t('tour.noTransport')}</option>
+                              {fromRoutes.map(r => (
+                                <option key={r.id} value={`${r.origin} → ${r.destination} (${r.vehicle_type})`}>
+                                  {r.origin} → {r.destination} — {r.vehicle_type} (${r.price}{r.vehicle_type === 'Private Car' ? '/car' : '/person'})
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        )}
+                        {needsPickup && (
+                          <label>
+                            {t('transport.pickup')}
+                            <input type="text" value={pickup} onChange={e => setPickup(e.target.value)} placeholder={t('transport.pickupPlaceholder')} />
+                          </label>
+                        )}
+                      </div>
+                    )
+                  })()}
 
                   <label>
                     {t('tour.comments')}
@@ -289,19 +344,32 @@ export default function TourDetail() {
                   </label>
 
                   {(() => {
-                    const transportRoute = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === selectedTransport)
-                    const transportCost = transportRoute ? (transportRoute.vehicle_type === 'Private Car' ? transportRoute.price : transportRoute.price * numGuests) : 0
-                    const tourTotal = tour.price * numGuests
+                    const getTransportCost = (selected: string) => {
+                      const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === selected)
+                      if (!route) return 0
+                      return route.vehicle_type === 'Private Car' ? route.price : route.price * numGuests
+                    }
+                    const toCost = getTransportCost(transportTo)
+                    const fromCost = getTransportCost(transportFrom)
+                    const transportCost = toCost + fromCost
+                    const pricePerPerson = rideType === 'easy_rider' ? tour.price * 1.2 : tour.price
+                    const tourTotal = pricePerPerson * numGuests
                     return (
                       <div className="booking-total-section">
                         <div className="booking-total-line">
-                          <span>{t('nav.tours')}</span>
+                          <span>{t('nav.tours')}{rideType === 'easy_rider' ? ' (Easy Rider)' : ''}</span>
                           <span>${tourTotal.toFixed(2)}</span>
                         </div>
-                        {transportCost > 0 && (
+                        {toCost > 0 && (
                           <div className="booking-total-line">
-                            <span>{t('nav.transport')}</span>
-                            <span>${transportCost.toFixed(2)}</span>
+                            <span>{transportTo.split('(')[0].trim()}</span>
+                            <span>${toCost.toFixed(2)}</span>
+                          </div>
+                        )}
+                        {fromCost > 0 && (
+                          <div className="booking-total-line">
+                            <span>{transportFrom.split('(')[0].trim()}</span>
+                            <span>${fromCost.toFixed(2)}</span>
                           </div>
                         )}
                         <div className="booking-total">

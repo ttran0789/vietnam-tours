@@ -63,7 +63,10 @@ export default function MyBookings() {
               {bookings.map(booking => (
                 <div key={`tour-${booking.id}`} className="booking-item">
                   <div className="booking-item-info">
-                    <h3>{booking.tour?.name || `Tour #${booking.tour_id}`}</h3>
+                    <h3>
+                      {booking.tour?.name || `Tour #${booking.tour_id}`}
+                      {booking.ride_type === 'easy_rider' && <span className="booking-vehicle-badge">Easy Rider</span>}
+                    </h3>
                     <div className="booking-item-details">
                       <span>{t('bookings.date', { date: booking.start_date })}</span>
                       <span>{t('bookings.guests', { count: booking.num_guests })}</span>

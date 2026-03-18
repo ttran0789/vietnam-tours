@@ -78,6 +78,7 @@ class BookingCreate(BaseModel):
     tour_id: int
     start_date: str
     num_guests: int = 1
+    ride_type: str = "self"  # "self" or "easy_rider"
     comments: str = ""
 
 
@@ -87,6 +88,7 @@ class BookingResponse(BaseModel):
     start_date: str
     num_guests: int
     total_price: float
+    ride_type: str = "self"
     status: str
     comments: str = ""
     admin_notes: str = ""

@@ -46,6 +46,12 @@
     "instantNote": "Đặt ngay! Bạn sẽ chuyển sang thanh toán.",
     "addTransport": "Thêm Vận Chuyển",
     "noTransport": "Không cần vận chuyển",
+    "rideType": "Hình Thức Đi",
+    "selfRide": "Tự Lái",
+    "easyRider": "Easy Rider",
+    "easyRiderDesc": "Ngồi sau thưởng cảnh — tài xế kinh nghiệm lái cho bạn.",
+    "transportTo": "Đi Đến",
+    "transportFrom": "Trở Về",
     "bookingSubmitted": "Đã Gửi Yêu Cầu!",
     "bookingSubmittedDesc": "Chúng tôi sẽ xem xét đặt chỗ và thông báo khi được duyệt. Sau đó bạn có thể thanh toán."
   },

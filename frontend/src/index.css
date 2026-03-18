@@ -639,6 +639,49 @@ a { color: var(--primary); text-decoration: none; }
   font-weight: 600;
 }
 
+/* ── Ride Type Selector ───────────────────────── */
+.ride-type-selector {
+  margin-bottom: 1rem;
+}
+.ride-type-selector > label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.ride-type-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.ride-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+.ride-type-btn:hover { border-color: var(--primary); }
+.ride-type-active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+.ride-type-btn strong { font-size: 0.85rem; }
+.ride-type-btn span { font-size: 0.75rem; color: var(--text-light); }
+.ride-type-active span { color: var(--primary); }
+.ride-type-note {
+  font-size: 0.75rem;
+  color: var(--primary);
+  margin-top: 0.375rem;
+  font-style: italic;
+}
+
 /* ── Transport Addon ──────────────────────────── */
 .transport-addon {
   border: 1.5px solid var(--border);
@@ -648,6 +691,12 @@ a { color: var(--primary); text-decoration: none; }
   background: var(--bg);
 }
 .transport-addon label { margin-bottom: 0.5rem; }
+.transport-addon-title {
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  margin-bottom: 0.75rem !important;
+  color: var(--text) !important;
+}
 .booking-total-section { margin-bottom: 1rem; }
 .booking-total-line {
   display: flex;
