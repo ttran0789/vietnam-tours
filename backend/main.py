@@ -288,7 +288,25 @@ def create_booking(
     if data.group_type == "small":
         price_per_person *= 1.15
     total_price = price_per_person * data.num_guests
+
+    # Add bundled transport costs
+    transport_details = []
+    for route_id, location, label in [
+        (data.transport_to_id, data.pickup_location, "to"),
+        (data.transport_from_id, data.dropoff_location, "from"),
+    ]:
+        if route_id:
+            route = db.query(TransportRoute).filter(TransportRoute.id == route_id).first()
+            if route:
+                if route.vehicle_type == "Private Car":
+                    transport_cost = route.price
+                else:
+                    transport_cost = route.price * data.num_guests
+                total_price += transport_cost
+                transport_details.append((route, location, label, transport_cost))
+
     auto_approve = is_instant_booking(data.start_date)
+    status = BookingStatus.APPROVED if auto_approve else BookingStatus.PENDING
     booking = Booking(
         user_id=user.id,
         tour_id=data.tour_id,
@@ -297,12 +315,27 @@ def create_booking(
         total_price=total_price,
         ride_type=data.ride_type,
         group_type=data.group_type,
-        status=BookingStatus.APPROVED if auto_approve else BookingStatus.PENDING,
+        status=status,
         comments=data.comments,
     )
     db.add(booking)
     db.commit()
     db.refresh(booking)
+
+    # Create bundled transport bookings (auto-confirmed with tour)
+    for route, location, label, cost in transport_details:
+        tb = TransportBooking(
+            user_id=user.id,
+            route_id=route.id,
+            travel_date=data.start_date,
+            num_passengers=1 if route.vehicle_type == "Private Car" else data.num_guests,
+            total_price=cost,
+            status=status,
+            comments=f"Bundled with tour: {tour.name}",
+            pickup_location=location,
+        )
+        db.add(tb)
+    db.commit()
 
     if auto_approve:
         send_booking_approved(user.email, user.name, tour.name, booking.id, "Instant booking - approved automatically")
@@ -985,6 +1018,15 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                 booking = db.query(Booking).filter(Booking.id == int(booking_id)).first()
                 if booking:
                     booking.status = BookingStatus.CONFIRMED
+                    # Also confirm any bundled transport bookings
+                    bundled = db.query(TransportBooking).filter(
+                        TransportBooking.user_id == booking.user_id,
+                        TransportBooking.travel_date == booking.start_date,
+                        TransportBooking.comments.contains("Bundled with tour"),
+                        TransportBooking.status == BookingStatus.APPROVED,
+                    ).all()
+                    for tb in bundled:
+                        tb.status = BookingStatus.CONFIRMED
                     db.commit()
                     user = db.query(User).filter(User.id == booking.user_id).first()
                     tour = db.query(Tour).filter(Tour.id == booking.tour_id).first()

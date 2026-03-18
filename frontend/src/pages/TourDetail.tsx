@@ -76,29 +76,13 @@ export default function TourDetail() {
     setBooking(true)
     setError('')
     try {
-      const transportParts = []
-      if (transportTo) transportParts.push(`To: ${transportTo}`)
-      if (transportFrom) transportParts.push(`Return: ${transportFrom}`)
-      const transportComment = transportParts.length > 0 ? `\n[Transport: ${transportParts.join(', ')}]` : ''
-      const fullComments = comments + transportComment
+      const toRoute = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === transportTo)
+      const fromRoute = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === transportFrom)
 
-      const res: any = await api.createBooking(tour!.id, startDate, numGuests, fullComments, rideType, groupType)
-
-      // Create transport bookings if selected
-      if (transportTo) {
-        const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === transportTo)
-        if (route) {
-          const passengers = route.vehicle_type === 'Private Car' ? 1 : numGuests
-          await api.createTransportBooking(route.id, startDate, passengers, `Bundled with tour: ${tour!.name}`, pickup)
-        }
-      }
-      if (transportFrom) {
-        const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === transportFrom)
-        if (route) {
-          const passengers = route.vehicle_type === 'Private Car' ? 1 : numGuests
-          await api.createTransportBooking(route.id, startDate, passengers, `Bundled with tour: ${tour!.name}`, dropoff)
-        }
-      }
+      const res: any = await api.createBooking(
+        tour!.id, startDate, numGuests, comments, rideType, groupType,
+        toRoute?.id, fromRoute?.id, pickup, dropoff
+      )
 
       navigate('/booking-confirmed')
     } catch (e: any) {

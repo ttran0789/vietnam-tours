@@ -81,6 +81,10 @@ class BookingCreate(BaseModel):
     ride_type: str = "self"  # "self" or "easy_rider"
     group_type: str = "regular"  # "regular" or "small"
     comments: str = ""
+    transport_to_id: Optional[int] = None
+    transport_from_id: Optional[int] = None
+    pickup_location: str = ""
+    dropoff_location: str = ""
 
 
 class BookingResponse(BaseModel):

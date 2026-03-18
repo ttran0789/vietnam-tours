@@ -67,10 +67,15 @@ export const api = {
   getReviews: (tourId?: number) =>
     request(`/reviews${tourId ? `?tour_id=${tourId}` : ''}`),
 
-  createBooking: (tourId: number, startDate: string, numGuests: number, comments: string, rideType: string = 'self', groupType: string = 'regular') =>
+  createBooking: (tourId: number, startDate: string, numGuests: number, comments: string, rideType: string = 'self', groupType: string = 'regular', transportToId?: number, transportFromId?: number, pickupLocation: string = '', dropoffLocation: string = '') =>
     request('/bookings', {
       method: 'POST',
-      body: JSON.stringify({ tour_id: tourId, start_date: startDate, num_guests: numGuests, comments, ride_type: rideType, group_type: groupType }),
+      body: JSON.stringify({
+        tour_id: tourId, start_date: startDate, num_guests: numGuests, comments,
+        ride_type: rideType, group_type: groupType,
+        transport_to_id: transportToId || null, transport_from_id: transportFromId || null,
+        pickup_location: pickupLocation, dropoff_location: dropoffLocation,
+      }),
     }),
 
   getBookings: () => request('/bookings'),
