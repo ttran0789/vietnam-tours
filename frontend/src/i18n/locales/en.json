@@ -52,6 +52,10 @@
     "easyRiderDesc": "Sit back and enjoy — an experienced rider drives while you take in the views.",
     "transportTo": "Getting There",
     "transportFrom": "Getting Back",
+    "pickupLocation": "Pickup Location",
+    "pickupPlaceholder": "Hotel name or address for pickup...",
+    "dropoffLocation": "Drop-off Location",
+    "dropoffPlaceholder": "Hotel name or address for drop-off...",
     "bookingSubmitted": "Request Submitted!",
     "bookingSubmittedDesc": "We'll review your booking and notify you once approved. You can then proceed to payment."
   },

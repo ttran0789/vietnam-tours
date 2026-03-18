@@ -52,6 +52,10 @@
     "easyRiderDesc": "Ngồi sau thưởng cảnh — tài xế kinh nghiệm lái cho bạn.",
     "transportTo": "Đi Đến",
     "transportFrom": "Trở Về",
+    "pickupLocation": "Địa Điểm Đón",
+    "pickupPlaceholder": "Tên khách sạn hoặc địa chỉ đón...",
+    "dropoffLocation": "Địa Điểm Trả",
+    "dropoffPlaceholder": "Tên khách sạn hoặc địa chỉ trả...",
     "bookingSubmitted": "Đã Gửi Yêu Cầu!",
     "bookingSubmittedDesc": "Chúng tôi sẽ xem xét đặt chỗ và thông báo khi được duyệt. Sau đó bạn có thể thanh toán."
   },

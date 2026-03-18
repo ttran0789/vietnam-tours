@@ -52,6 +52,10 @@
     "easyRiderDesc": "Lehn dich zurück — ein erfahrener Fahrer fährt, während du die Aussicht genießt.",
     "transportTo": "Hinfahrt",
     "transportFrom": "Rückfahrt",
+    "pickupLocation": "Abholort",
+    "pickupPlaceholder": "Hotelname oder Adresse für Abholung...",
+    "dropoffLocation": "Absetzort",
+    "dropoffPlaceholder": "Hotelname oder Adresse für Absetzung...",
     "bookingSubmitted": "Anfrage Gesendet!",
     "bookingSubmittedDesc": "Wir prüfen deine Buchung und benachrichtigen dich nach Genehmigung. Dann kannst du zur Zahlung fortfahren."
   },

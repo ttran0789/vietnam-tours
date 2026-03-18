@@ -52,6 +52,10 @@
     "easyRiderDesc": "Relájate y disfruta — un conductor experimentado maneja mientras tú disfrutas las vistas.",
     "transportTo": "Ida",
     "transportFrom": "Vuelta",
+    "pickupLocation": "Lugar de Recogida",
+    "pickupPlaceholder": "Nombre del hotel o dirección de recogida...",
+    "dropoffLocation": "Lugar de Entrega",
+    "dropoffPlaceholder": "Nombre del hotel o dirección de entrega...",
     "bookingSubmitted": "¡Solicitud Enviada!",
     "bookingSubmittedDesc": "Revisaremos tu reserva y te notificaremos una vez aprobada. Luego podrás proceder al pago."
   },

@@ -36,6 +36,7 @@ export default function TourDetail() {
   const [transportTo, setTransportTo] = useState('')
   const [transportFrom, setTransportFrom] = useState('')
   const [pickup, setPickup] = useState('')
+  const [dropoff, setDropoff] = useState('')
 
   useEffect(() => {
     if (slug) {
@@ -83,13 +84,18 @@ export default function TourDetail() {
       const res: any = await api.createBooking(tour!.id, startDate, numGuests, fullComments, rideType)
 
       // Create transport bookings if selected
-      for (const selected of [transportTo, transportFrom]) {
-        if (selected) {
-          const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === selected)
-          if (route) {
-            const passengers = route.vehicle_type === 'Private Car' ? 1 : numGuests
-            await api.createTransportBooking(route.id, startDate, passengers, `Bundled with tour: ${tour!.name}`, pickup)
-          }
+      if (transportTo) {
+        const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === transportTo)
+        if (route) {
+          const passengers = route.vehicle_type === 'Private Car' ? 1 : numGuests
+          await api.createTransportBooking(route.id, startDate, passengers, `Bundled with tour: ${tour!.name}`, pickup)
+        }
+      }
+      if (transportFrom) {
+        const route = transportRoutes.find(r => `${r.origin} → ${r.destination} (${r.vehicle_type})` === transportFrom)
+        if (route) {
+          const passengers = route.vehicle_type === 'Private Car' ? 1 : numGuests
+          await api.createTransportBooking(route.id, startDate, passengers, `Bundled with tour: ${tour!.name}`, dropoff)
         }
       }
 
@@ -292,7 +298,8 @@ export default function TourDetail() {
                     const location = tour.location?.split(',')[0].trim().toLowerCase() || ''
                     const toRoutes = transportRoutes.filter(r => r.destination.toLowerCase().includes(location))
                     const fromRoutes = transportRoutes.filter(r => r.origin.toLowerCase().includes(location))
-                    const needsPickup = (transportTo + transportFrom).includes('Private Car')
+                    const toIsCar = transportTo.includes('Private Car')
+                    const fromIsCar = transportFrom.includes('Private Car')
 
                     return (
                       <div className="transport-addon">
@@ -310,6 +317,12 @@ export default function TourDetail() {
                             </select>
                           </label>
                         )}
+                        {toIsCar && (
+                          <label>
+                            {t('tour.pickupLocation')}
+                            <input type="text" value={pickup} onChange={e => setPickup(e.target.value)} placeholder={t('tour.pickupPlaceholder')} />
+                          </label>
+                        )}
                         {fromRoutes.length > 0 && (
                           <label>
                             {t('tour.transportFrom')}
@@ -323,10 +336,10 @@ export default function TourDetail() {
                             </select>
                           </label>
                         )}
-                        {needsPickup && (
+                        {fromIsCar && (
                           <label>
-                            {t('transport.pickup')}
-                            <input type="text" value={pickup} onChange={e => setPickup(e.target.value)} placeholder={t('transport.pickupPlaceholder')} />
+                            {t('tour.dropoffLocation')}
+                            <input type="text" value={dropoff} onChange={e => setDropoff(e.target.value)} placeholder={t('tour.dropoffPlaceholder')} />
                           </label>
                         )}
                       </div>
