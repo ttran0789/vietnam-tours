@@ -33,6 +33,7 @@ export default function TourDetail() {
   const [coverUrl, setCoverUrl] = useState('')
   const [transportRoutes, setTransportRoutes] = useState<TransportRoute[]>([])
   const [rideType, setRideType] = useState('self')
+  const [groupType, setGroupType] = useState('regular')
   const [transportTo, setTransportTo] = useState('')
   const [transportFrom, setTransportFrom] = useState('')
   const [pickup, setPickup] = useState('')
@@ -81,7 +82,7 @@ export default function TourDetail() {
       const transportComment = transportParts.length > 0 ? `\n[Transport: ${transportParts.join(', ')}]` : ''
       const fullComments = comments + transportComment
 
-      const res: any = await api.createBooking(tour!.id, startDate, numGuests, fullComments, rideType)
+      const res: any = await api.createBooking(tour!.id, startDate, numGuests, fullComments, rideType, groupType)
 
       // Create transport bookings if selected
       if (transportTo) {
@@ -261,7 +262,7 @@ export default function TourDetail() {
                   <label>
                     {t('tour.numGuests')}
                     <select value={numGuests} onChange={e => setNumGuests(Number(e.target.value))}>
-                      {Array.from({ length: tour.max_group_size }, (_, i) => i + 1).map(n => (
+                      {Array.from({ length: groupType === 'small' ? Math.min(5, tour.max_group_size) : tour.max_group_size }, (_, i) => i + 1).map(n => (
                         <option key={n} value={n}>
                           {n === 1 ? t('tour.guest', { count: n }) : t('tour.guests', { count: n })}
                         </option>
@@ -292,6 +293,28 @@ export default function TourDetail() {
                     {rideType === 'easy_rider' && (
                       <p className="ride-type-note">{t('tour.easyRiderDesc')}</p>
                     )}
+                  </div>
+
+                  <div className="ride-type-selector">
+                    <label>{t('tour.groupSize')}</label>
+                    <div className="ride-type-options">
+                      <button
+                        type="button"
+                        className={`ride-type-btn ${groupType === 'regular' ? 'ride-type-active' : ''}`}
+                        onClick={() => { setGroupType('regular'); if (numGuests > tour.max_group_size) setNumGuests(tour.max_group_size) }}
+                      >
+                        <strong>{t('tour.regularGroup')}</strong>
+                        <span>{t('tour.regularGroupDesc', { max: tour.max_group_size })}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`ride-type-btn ${groupType === 'small' ? 'ride-type-active' : ''}`}
+                        onClick={() => { setGroupType('small'); if (numGuests > 5) setNumGuests(5) }}
+                      >
+                        <strong>{t('tour.smallGroup')}</strong>
+                        <span>{t('tour.smallGroupDesc')}</span>
+                      </button>
+                    </div>
                   </div>
 
                   {transportRoutes.length > 0 && (() => {
@@ -365,12 +388,14 @@ export default function TourDetail() {
                     const toCost = getTransportCost(transportTo)
                     const fromCost = getTransportCost(transportFrom)
                     const transportCost = toCost + fromCost
-                    const pricePerPerson = rideType === 'easy_rider' ? tour.price * 1.2 : tour.price
+                    let pricePerPerson = tour.price
+                    if (rideType === 'easy_rider') pricePerPerson *= 1.2
+                    if (groupType === 'small') pricePerPerson *= 1.15
                     const tourTotal = pricePerPerson * numGuests
                     return (
                       <div className="booking-total-section">
                         <div className="booking-total-line">
-                          <span>{t('nav.tours')}{rideType === 'easy_rider' ? ' (Easy Rider)' : ''}</span>
+                          <span>{t('nav.tours')}{rideType === 'easy_rider' ? ' (Easy Rider)' : ''}{groupType === 'small' ? ' (Small Group)' : ''}</span>
                           <span>${tourTotal.toFixed(2)}</span>
                         </div>
                         {toCost > 0 && (

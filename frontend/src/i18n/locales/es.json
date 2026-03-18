@@ -56,6 +56,11 @@
     "pickupPlaceholder": "Nombre del hotel o dirección de recogida...",
     "dropoffLocation": "Lugar de Entrega",
     "dropoffPlaceholder": "Nombre del hotel o dirección de entrega...",
+    "groupSize": "Tamaño del Grupo",
+    "regularGroup": "Grupo Regular",
+    "regularGroupDesc": "Hasta {{max}} viajeros",
+    "smallGroup": "Grupo Pequeño (+15%)",
+    "smallGroupDesc": "3-5 viajeros máx, más personal",
     "bookingSubmitted": "¡Solicitud Enviada!",
     "bookingSubmittedDesc": "Revisaremos tu reserva y te notificaremos una vez aprobada. Luego podrás proceder al pago."
   },

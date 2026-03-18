@@ -66,6 +66,7 @@ export default function MyBookings() {
                     <h3>
                       {booking.tour?.name || `Tour #${booking.tour_id}`}
                       {booking.ride_type === 'easy_rider' && <span className="booking-vehicle-badge">Easy Rider</span>}
+                      {booking.group_type === 'small' && <span className="booking-vehicle-badge">Small Group</span>}
                     </h3>
                     <div className="booking-item-details">
                       <span>{t('bookings.date', { date: booking.start_date })}</span>

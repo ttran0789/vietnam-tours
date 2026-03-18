@@ -56,6 +56,11 @@
     "pickupPlaceholder": "Hotel name or address for pickup...",
     "dropoffLocation": "Drop-off Location",
     "dropoffPlaceholder": "Hotel name or address for drop-off...",
+    "groupSize": "Group Size",
+    "regularGroup": "Regular Group",
+    "regularGroupDesc": "Up to {{max}} travelers",
+    "smallGroup": "Small Group (+15%)",
+    "smallGroupDesc": "3-5 travelers max, more personal",
     "bookingSubmitted": "Request Submitted!",
     "bookingSubmittedDesc": "We'll review your booking and notify you once approved. You can then proceed to payment."
   },

@@ -56,6 +56,11 @@
     "pickupPlaceholder": "Hotelname oder Adresse für Abholung...",
     "dropoffLocation": "Absetzort",
     "dropoffPlaceholder": "Hotelname oder Adresse für Absetzung...",
+    "groupSize": "Gruppengröße",
+    "regularGroup": "Reguläre Gruppe",
+    "regularGroupDesc": "Bis zu {{max}} Reisende",
+    "smallGroup": "Kleine Gruppe (+15%)",
+    "smallGroupDesc": "Max 3-5 Reisende, persönlicher",
     "bookingSubmitted": "Anfrage Gesendet!",
     "bookingSubmittedDesc": "Wir prüfen deine Buchung und benachrichtigen dich nach Genehmigung. Dann kannst du zur Zahlung fortfahren."
   },

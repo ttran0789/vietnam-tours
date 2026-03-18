@@ -279,7 +279,11 @@ def create_booking(
     tour = db.query(Tour).filter(Tour.id == data.tour_id).first()
     if not tour:
         raise HTTPException(status_code=404, detail="Tour not found")
-    price_per_person = tour.price * 1.2 if data.ride_type == "easy_rider" else tour.price
+    price_per_person = tour.price
+    if data.ride_type == "easy_rider":
+        price_per_person *= 1.2
+    if data.group_type == "small":
+        price_per_person *= 1.15
     total_price = price_per_person * data.num_guests
     auto_approve = is_instant_booking(data.start_date)
     booking = Booking(
@@ -289,6 +293,7 @@ def create_booking(
         num_guests=data.num_guests,
         total_price=total_price,
         ride_type=data.ride_type,
+        group_type=data.group_type,
         status=BookingStatus.APPROVED if auto_approve else BookingStatus.PENDING,
         comments=data.comments,
     )

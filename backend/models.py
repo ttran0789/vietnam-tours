@@ -62,6 +62,7 @@ class Booking(Base):
     total_price = Column(Float, nullable=False)
     status = Column(String, default=BookingStatus.PENDING)
     ride_type = Column(String, default="self")  # "self" or "easy_rider"
+    group_type = Column(String, default="regular")  # "regular" or "small"
     comments = Column(Text, default="")
     admin_notes = Column(Text, default="")
     stripe_payment_intent_id = Column(String)

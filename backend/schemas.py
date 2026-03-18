@@ -79,6 +79,7 @@ class BookingCreate(BaseModel):
     start_date: str
     num_guests: int = 1
     ride_type: str = "self"  # "self" or "easy_rider"
+    group_type: str = "regular"  # "regular" or "small"
     comments: str = ""
 
 
@@ -89,6 +90,7 @@ class BookingResponse(BaseModel):
     num_guests: int
     total_price: float
     ride_type: str = "self"
+    group_type: str = "regular"
     status: str
     comments: str = ""
     admin_notes: str = ""

@@ -56,6 +56,11 @@
     "pickupPlaceholder": "Tên khách sạn hoặc địa chỉ đón...",
     "dropoffLocation": "Địa Điểm Trả",
     "dropoffPlaceholder": "Tên khách sạn hoặc địa chỉ trả...",
+    "groupSize": "Quy Mô Nhóm",
+    "regularGroup": "Nhóm Thường",
+    "regularGroupDesc": "Tối đa {{max}} người",
+    "smallGroup": "Nhóm Nhỏ (+15%)",
+    "smallGroupDesc": "Tối đa 3-5 người, cá nhân hơn",
     "bookingSubmitted": "Đã Gửi Yêu Cầu!",
     "bookingSubmittedDesc": "Chúng tôi sẽ xem xét đặt chỗ và thông báo khi được duyệt. Sau đó bạn có thể thanh toán."
   },
