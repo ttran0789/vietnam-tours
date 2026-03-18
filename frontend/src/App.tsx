@@ -18,7 +18,8 @@ import AdminImages from './pages/AdminImages'
 import AdminUsers from './pages/AdminUsers'
 import AdminUpcoming from './pages/AdminUpcoming'
 import AdminPricing from './pages/AdminPricing'
-import WhatsAppButton from './components/WhatsAppButton'
+import ChatWidget from './components/ChatWidget'
+import AdminChat from './pages/AdminChat'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -57,9 +58,10 @@ export default function App() {
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
           <Route path="/admin/upcoming" element={<AdminRoute><AdminUpcoming /></AdminRoute>} />
           <Route path="/admin/pricing" element={<AdminRoute><AdminPricing /></AdminRoute>} />
+          <Route path="/admin/chat" element={<AdminRoute><AdminChat /></AdminRoute>} />
         </Routes>
       </main>
-      <WhatsAppButton />
+      <ChatWidget />
     </>
   )
 }

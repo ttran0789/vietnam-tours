@@ -120,3 +120,17 @@ class Review(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     tour = relationship("Tour", backref="reviews")
+
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    conversation_id = Column(String, nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    sender = Column(String, nullable=False)  # "user" or "admin"
+    name = Column(String, default="")
+    message = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User")

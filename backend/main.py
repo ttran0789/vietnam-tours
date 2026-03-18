@@ -11,7 +11,7 @@ import json
 load_dotenv()
 
 from database import engine, Base, get_db
-from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review
+from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review, ChatMessage
 from schemas import (
     UserCreate, UserLogin, UserResponse, TokenResponse,
     TourResponse, BookingCreate, BookingResponse, BookingAdminAction,
@@ -25,6 +25,7 @@ from email_service import (
     send_welcome, send_password_reset,
 )
 from schemas import ForgotPassword, ResetPassword, ChangePassword, UserUpdate
+from telegram_service import notify_new_chat, send_telegram, BOT_TOKEN
 from seed_data import seed
 
 Base.metadata.create_all(bind=engine)
@@ -734,6 +735,162 @@ def get_tour_images(tour_slug: str):
     cover_url = f"/api/uploads/photos/{cover}" if cover and os.path.exists(os.path.join(PHOTOS_DIR, cover)) else ""
 
     return {"uploaded": uploaded, "disabled_stock": disabled_stock, "cover": cover_url}
+
+
+# ── Chat ─────────────────────────────────────────────────────────────────
+
+@app.post("/api/chat/send")
+async def chat_send(request: Request, db: Session = Depends(get_db)):
+    """Send a chat message (from user or guest)."""
+    data = await request.json()
+    conversation_id = data.get("conversation_id", "")
+    message_text = data.get("message", "").strip()
+    name = data.get("name", "Guest")
+    user_id = None
+
+    if not message_text:
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+
+    # Try to get user from token
+    from fastapi.security import OAuth2PasswordBearer
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        try:
+            from auth import verify_reset_token
+            from jose import jwt
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, os.getenv("SECRET_KEY", "dev-secret-key-change-in-production"), algorithms=["HS256"])
+            uid = int(payload.get("sub", 0))
+            user = db.query(User).filter(User.id == uid).first()
+            if user:
+                user_id = user.id
+                name = user.name
+                if not conversation_id:
+                    conversation_id = f"user-{user.id}"
+        except Exception:
+            pass
+
+    if not conversation_id:
+        import uuid as _uuid
+        conversation_id = f"guest-{_uuid.uuid4().hex[:8]}"
+
+    msg = ChatMessage(
+        conversation_id=conversation_id,
+        user_id=user_id,
+        sender="user",
+        name=name,
+        message=message_text,
+    )
+    db.add(msg)
+    db.commit()
+
+    notify_new_chat(conversation_id, name, message_text)
+
+    return {"conversation_id": conversation_id, "message_id": msg.id}
+
+
+@app.get("/api/chat/messages/{conversation_id}")
+def chat_messages(conversation_id: str, db: Session = Depends(get_db)):
+    """Get messages for a conversation."""
+    messages = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.conversation_id == conversation_id)
+        .order_by(ChatMessage.created_at.asc())
+        .all()
+    )
+    return [
+        {"id": m.id, "sender": m.sender, "name": m.name, "message": m.message,
+         "created_at": m.created_at.isoformat() if m.created_at else None}
+        for m in messages
+    ]
+
+
+# Admin chat endpoints
+@app.get("/api/admin/chat/conversations")
+def admin_conversations(admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """List all chat conversations with latest message."""
+    from sqlalchemy import distinct
+    conv_ids = db.query(distinct(ChatMessage.conversation_id)).all()
+    conversations = []
+    for (conv_id,) in conv_ids:
+        last_msg = (
+            db.query(ChatMessage)
+            .filter(ChatMessage.conversation_id == conv_id)
+            .order_by(ChatMessage.created_at.desc())
+            .first()
+        )
+        unread = (
+            db.query(ChatMessage)
+            .filter(ChatMessage.conversation_id == conv_id, ChatMessage.sender == "user")
+            .count()
+        )
+        if last_msg:
+            conversations.append({
+                "conversation_id": conv_id,
+                "name": last_msg.name,
+                "last_message": last_msg.message,
+                "last_sender": last_msg.sender,
+                "last_at": last_msg.created_at.isoformat() if last_msg.created_at else None,
+                "total_messages": db.query(ChatMessage).filter(ChatMessage.conversation_id == conv_id).count(),
+            })
+    conversations.sort(key=lambda c: c["last_at"] or "", reverse=True)
+    return conversations
+
+
+@app.post("/api/admin/chat/reply")
+async def admin_chat_reply(request: Request, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """Admin sends a reply to a conversation."""
+    data = await request.json()
+    conversation_id = data.get("conversation_id", "")
+    message_text = data.get("message", "").strip()
+
+    if not conversation_id or not message_text:
+        raise HTTPException(status_code=400, detail="Missing conversation_id or message")
+
+    msg = ChatMessage(
+        conversation_id=conversation_id,
+        user_id=admin.id,
+        sender="admin",
+        name="Travel VN Tours",
+        message=message_text,
+    )
+    db.add(msg)
+    db.commit()
+
+    return {"message_id": msg.id}
+
+
+# Telegram webhook for admin replies
+@app.post("/api/telegram/webhook")
+async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
+    """Receive admin replies from Telegram."""
+    data = await request.json()
+    message = data.get("message", {})
+    text = message.get("text", "")
+    chat_id = str(message.get("chat", {}).get("id", ""))
+
+    if chat_id != os.getenv("TELEGRAM_CHAT_ID", "") or not text:
+        return {"ok": True}
+
+    # Parse "#conv_id message" format
+    if text.startswith("#"):
+        parts = text.split(" ", 1)
+        if len(parts) == 2:
+            conversation_id = parts[0][1:]  # Remove #
+            reply_text = parts[1]
+
+            msg = ChatMessage(
+                conversation_id=conversation_id,
+                sender="admin",
+                name="Travel VN Tours",
+                message=reply_text,
+            )
+            db.add(msg)
+            db.commit()
+
+            send_telegram(f"✅ Reply sent to #{conversation_id}")
+
+    return {"ok": True}
 
 
 # ── Stripe Payments ──────────────────────────────────────────────────────
