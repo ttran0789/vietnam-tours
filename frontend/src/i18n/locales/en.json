@@ -149,6 +149,7 @@
   },
   "payment": {
     "title": "Complete Payment",
+    "orderSummary": "Order Summary",
     "loading": "Loading payment...",
     "noStripeTitle": "Stripe Not Configured",
     "noStripeDesc": "To enable payments, add your Stripe keys to the backend .env file. Your booking has been approved and is ready for payment.",

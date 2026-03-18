@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { api } from '../api'
+import { Booking, TransportBooking } from '../types'
 import SEO from '../components/SEO'
 
 function CheckoutForm({ bookingId }: { bookingId: number }) {
@@ -73,6 +74,23 @@ export default function PaymentPage() {
   const [error, setError] = useState('')
   const [noStripe, setNoStripe] = useState(false)
   const [configChecked, setConfigChecked] = useState(false)
+  const [booking, setBooking] = useState<any>(null)
+
+  // Load booking details
+  useEffect(() => {
+    if (!bookingId) return
+    if (bookingType === 'transport') {
+      api.getTransportBookings().then((data: any) => {
+        const found = data.find((b: TransportBooking) => b.id === Number(bookingId))
+        if (found) setBooking({ ...found, type: 'transport' })
+      })
+    } else {
+      api.getBookings().then((data: any) => {
+        const found = data.find((b: Booking) => b.id === Number(bookingId))
+        if (found) setBooking({ ...found, type: 'tour' })
+      })
+    }
+  }, [bookingId, bookingType])
 
   useEffect(() => {
     api.getStripeConfig()
@@ -120,6 +138,53 @@ export default function PaymentPage() {
       <SEO title="Payment" />
       <div className="payment-container">
         <h1>{t('payment.title')}</h1>
+
+        {booking && (
+          <div className="payment-summary">
+            <h3>{t('payment.orderSummary')}</h3>
+            {booking.type === 'tour' ? (
+              <>
+                <div className="payment-summary-row">
+                  <span>{booking.tour?.name || 'Tour'}</span>
+                </div>
+                <div className="payment-summary-detail">
+                  <span>{t('bookings.date', { date: booking.start_date })}</span>
+                  <span>{t('bookings.guests', { count: booking.num_guests })}</span>
+                </div>
+                {booking.ride_type === 'easy_rider' && (
+                  <div className="payment-summary-detail">
+                    <span>Easy Rider</span>
+                  </div>
+                )}
+                {booking.group_type === 'small' && (
+                  <div className="payment-summary-detail">
+                    <span>Small Group</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="payment-summary-row">
+                  <span>{booking.route ? `${booking.route.origin} → ${booking.route.destination}` : 'Transport'}</span>
+                </div>
+                <div className="payment-summary-detail">
+                  <span>{t('bookings.date', { date: booking.travel_date })}</span>
+                  {booking.route && <span>{booking.route.vehicle_type}</span>}
+                </div>
+                {booking.pickup_location && (
+                  <div className="payment-summary-detail">
+                    <span>{t('transport.pickup')}: {booking.pickup_location}</span>
+                  </div>
+                )}
+              </>
+            )}
+            <div className="payment-summary-total">
+              <span>{t('tour.total')}</span>
+              <span className="total-amount">${booking.total_price.toFixed(2)}</span>
+            </div>
+          </div>
+        )}
+
         {error && <div className="error-message">{error}</div>}
         {clientSecret && stripePromise ? (
           <Elements stripe={stripePromise} options={{ clientSecret }}>

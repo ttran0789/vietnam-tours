@@ -149,6 +149,7 @@
   },
   "payment": {
     "title": "Hoàn Tất Thanh Toán",
+    "orderSummary": "Chi Tiết Đơn Hàng",
     "loading": "Đang tải thanh toán...",
     "noStripeTitle": "Stripe Chưa Được Cấu Hình",
     "noStripeDesc": "Để kích hoạt thanh toán, thêm khóa Stripe vào file .env của backend. Đặt chỗ đã được duyệt và sẵn sàng thanh toán.",

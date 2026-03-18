@@ -149,6 +149,7 @@
   },
   "payment": {
     "title": "Zahlung Abschließen",
+    "orderSummary": "Bestellübersicht",
     "loading": "Zahlung wird geladen...",
     "noStripeTitle": "Stripe Nicht Konfiguriert",
     "noStripeDesc": "Um Zahlungen zu aktivieren, füge deine Stripe-Schlüssel zur .env-Datei hinzu. Deine Buchung wurde genehmigt und ist zahlungsbereit.",

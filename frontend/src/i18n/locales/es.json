@@ -149,6 +149,7 @@
   },
   "payment": {
     "title": "Completar Pago",
+    "orderSummary": "Resumen del Pedido",
     "loading": "Cargando pago...",
     "noStripeTitle": "Stripe No Configurado",
     "noStripeDesc": "Para habilitar pagos, agrega tus claves de Stripe al archivo .env del backend. Tu reserva ha sido aprobada y está lista para pagar.",
