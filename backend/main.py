@@ -950,10 +950,20 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
     webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+    test_webhook_secret = os.getenv("STRIPE_TEST_WEBHOOK_SECRET", "")
 
-    try:
-        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
-    except (ValueError, stripe.error.SignatureVerificationError):
+    # Try live secret first, then test secret
+    event = None
+    for secret in [webhook_secret, test_webhook_secret]:
+        if not secret:
+            continue
+        try:
+            event = stripe.Webhook.construct_event(payload, sig_header, secret)
+            break
+        except (ValueError, stripe.error.SignatureVerificationError):
+            continue
+
+    if not event:
         raise HTTPException(status_code=400, detail="Invalid webhook")
 
     if event["type"] == "payment_intent.succeeded":
