@@ -151,8 +151,16 @@ def send_booking_rejected(user_email: str, user_name: str, tour_name: str, admin
     _send_email(user_email, f"Booking Update - {tour_name}", _base_template(content))
 
 
-def send_payment_confirmed(user_email: str, user_name: str, tour_name: str, start_date: str, num_guests: int, total_price: float):
+def send_payment_confirmed(user_email: str, user_name: str, tour_name: str, start_date: str, num_guests: int, total_price: float, transport_lines: list = None):
     """Email to user when payment is confirmed."""
+    transport_html = ""
+    if transport_lines:
+        transport_html = '<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #a7f3d0;">'
+        transport_html += '<p style="margin: 5px 0; font-weight: 600;">Transportation Included:</p>'
+        for line in transport_lines:
+            transport_html += f'<p style="margin: 3px 0;">• {line["route"]} ({line["vehicle"]}) — ${line["price"]:.2f}</p>'
+        transport_html += '</div>'
+
     content = f"""
     <h2 style="color: #0f766e;">Payment Confirmed!</h2>
     <p>Hi {user_name},</p>
@@ -161,7 +169,8 @@ def send_payment_confirmed(user_email: str, user_name: str, tour_name: str, star
       <p style="margin: 5px 0;"><strong>Tour:</strong> {tour_name}</p>
       <p style="margin: 5px 0;"><strong>Date:</strong> {start_date}</p>
       <p style="margin: 5px 0;"><strong>Guests:</strong> {num_guests}</p>
-      <p style="margin: 5px 0;"><strong>Total Paid:</strong> ${total_price:.2f}</p>
+      {transport_html}
+      <p style="margin: 10px 0 5px 0; padding-top: 10px; border-top: 1px solid #a7f3d0;"><strong>Total Paid:</strong> ${total_price:.2f}</p>
     </div>
     <p>We'll be in touch with more details as your tour date approaches.</p>
     <p style="margin-top: 20px;">

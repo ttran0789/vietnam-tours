@@ -1028,7 +1028,17 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                     user = db.query(User).filter(User.id == booking.user_id).first()
                     tour = db.query(Tour).filter(Tour.id == booking.tour_id).first()
                     if user and tour:
-                        send_payment_confirmed(user.email, user.name, tour.name, booking.start_date, booking.num_guests, booking.total_price)
+                        # Build transport lines for email
+                        transport_lines = []
+                        for tb in bundled:
+                            route = db.query(TransportRoute).filter(TransportRoute.id == tb.route_id).first()
+                            if route:
+                                transport_lines.append({
+                                    "route": f"{route.origin} → {route.destination}",
+                                    "vehicle": route.vehicle_type,
+                                    "price": tb.total_price,
+                                })
+                        send_payment_confirmed(user.email, user.name, tour.name, booking.start_date, booking.num_guests, booking.total_price, transport_lines)
 
     return {"status": "ok"}
 
