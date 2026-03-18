@@ -331,7 +331,7 @@ def create_booking(
             num_passengers=1 if route.vehicle_type == "Private Car" else data.num_guests,
             total_price=cost,
             status=status,
-            comments=f"Bundled with tour: {tour.name}",
+            comments=f"[bundled:booking-{booking.id}]",
             pickup_location=location,
         )
         db.add(tb)
@@ -1020,10 +1020,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                     booking.status = BookingStatus.CONFIRMED
                     # Also confirm any bundled transport bookings
                     bundled = db.query(TransportBooking).filter(
-                        TransportBooking.user_id == booking.user_id,
-                        TransportBooking.travel_date == booking.start_date,
-                        TransportBooking.comments.contains("Bundled with tour"),
-                        TransportBooking.status == BookingStatus.APPROVED,
+                        TransportBooking.comments.contains(f"[bundled:booking-{booking.id}]"),
                     ).all()
                     for tb in bundled:
                         tb.status = BookingStatus.CONFIRMED

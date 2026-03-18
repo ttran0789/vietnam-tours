@@ -45,12 +45,12 @@ export default function MyBookings() {
   const isEmpty = bookings.length === 0 && transportBookings.length === 0
 
   // Separate bundled vs standalone transport
-  const bundledTransport = transportBookings.filter(tb => tb.comments?.includes('Bundled with tour'))
-  const standaloneTransport = transportBookings.filter(tb => !tb.comments?.includes('Bundled with tour'))
+  const bundledTransport = transportBookings.filter(tb => tb.comments?.includes('[bundled:booking-'))
+  const standaloneTransport = transportBookings.filter(tb => !tb.comments?.includes('[bundled:booking-'))
 
   // Get bundled transport for a specific tour booking
   const getBundledFor = (booking: Booking) =>
-    bundledTransport.filter(tb => tb.travel_date === booking.start_date)
+    bundledTransport.filter(tb => tb.comments?.includes(`[bundled:booking-${booking.id}]`))
 
   return (
     <div className="container">

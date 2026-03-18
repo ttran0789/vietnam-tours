@@ -93,9 +93,7 @@ export default function PaymentPage() {
           // Find bundled transport
           api.getTransportBookings().then((tdata: any) => {
             const bundled = tdata.filter((tb: TransportBooking) =>
-              tb.travel_date === found.start_date &&
-              tb.comments?.includes('Bundled with tour') &&
-              (tb.status === 'approved' || tb.status === 'pending')
+              tb.comments?.includes(`[bundled:booking-${found.id}]`)
             )
             setBundledTransport(bundled)
           })
