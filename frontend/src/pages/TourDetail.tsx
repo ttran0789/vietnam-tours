@@ -270,30 +270,32 @@ export default function TourDetail() {
                     </select>
                   </label>
 
-                  <div className="ride-type-selector">
-                    <label>{t('tour.rideType')}</label>
-                    <div className="ride-type-options">
-                      <button
-                        type="button"
-                        className={`ride-type-btn ${rideType === 'self' ? 'ride-type-active' : ''}`}
-                        onClick={() => setRideType('self')}
-                      >
-                        <strong>{t('tour.selfRide')}</strong>
-                        <span>${tour.price}/person</span>
-                      </button>
-                      <button
-                        type="button"
-                        className={`ride-type-btn ${rideType === 'easy_rider' ? 'ride-type-active' : ''}`}
-                        onClick={() => setRideType('easy_rider')}
-                      >
-                        <strong>{t('tour.easyRider')}</strong>
-                        <span>${(tour.price * 1.2).toFixed(0)}/person</span>
-                      </button>
+                  {!tour.slug.includes('jeep') && (
+                    <div className="ride-type-selector">
+                      <label>{t('tour.rideType')}</label>
+                      <div className="ride-type-options">
+                        <button
+                          type="button"
+                          className={`ride-type-btn ${rideType === 'self' ? 'ride-type-active' : ''}`}
+                          onClick={() => setRideType('self')}
+                        >
+                          <strong>{t('tour.selfRide')}</strong>
+                          <span>${tour.price}/person</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={`ride-type-btn ${rideType === 'easy_rider' ? 'ride-type-active' : ''}`}
+                          onClick={() => setRideType('easy_rider')}
+                        >
+                          <strong>{t('tour.easyRider')}</strong>
+                          <span>${(tour.price * 1.2).toFixed(0)}/person</span>
+                        </button>
+                      </div>
+                      {rideType === 'easy_rider' && (
+                        <p className="ride-type-note">{t('tour.easyRiderDesc')}</p>
+                      )}
                     </div>
-                    {rideType === 'easy_rider' && (
-                      <p className="ride-type-note">{t('tour.easyRiderDesc')}</p>
-                    )}
-                  </div>
+                  )}
 
                   <div className="ride-type-selector">
                     <label>{t('tour.groupSize')}</label>
