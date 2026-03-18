@@ -42,6 +42,8 @@ app.add_middleware(
 )
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_TEST_SECRET = os.getenv("STRIPE_TEST_SECRET_KEY", "")
+STRIPE_TEST_PUBLISHABLE = os.getenv("STRIPE_TEST_PUBLISHABLE_KEY", "")
 
 # Ensure upload directory exists
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "data", "uploads")
@@ -915,7 +917,11 @@ def create_payment_intent(
     if booking.status != BookingStatus.APPROVED:
         raise HTTPException(status_code=400, detail="Booking must be approved before payment")
 
-    if not stripe.api_key or stripe.api_key.startswith("sk_test_your"):
+    # Use test keys for admin users
+    use_test = user.is_admin and STRIPE_TEST_SECRET
+    api_key = STRIPE_TEST_SECRET if use_test else stripe.api_key
+
+    if not api_key or api_key.startswith("sk_test_your"):
         raise HTTPException(status_code=400, detail="Stripe is not configured. Add your Stripe keys to the .env file.")
 
     try:
@@ -923,12 +929,13 @@ def create_payment_intent(
             amount=int(booking.total_price * 100),  # cents
             currency="usd",
             automatic_payment_methods={"enabled": False},
-            payment_method_types=["card", "klarna"],
+            payment_method_types=["card"],
             metadata={
                 "booking_id": booking.id,
                 "booking_type": data.booking_type,
                 "user_id": user.id,
             },
+            api_key=api_key,
         )
     except stripe.error.AuthenticationError:
         raise HTTPException(status_code=400, detail="Stripe is not configured. Add your Stripe keys to the .env file.")
@@ -978,11 +985,29 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
 
 
 @app.get("/api/config/stripe")
-def get_stripe_config():
+def get_stripe_config(request: Request, db: Session = Depends(get_db)):
+    # Check if user is admin to return test keys
+    auth_header = request.headers.get("Authorization", "")
+    use_test = False
+    if auth_header.startswith("Bearer "):
+        try:
+            from jose import jwt
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, os.getenv("SECRET_KEY", "dev-secret-key-change-in-production"), algorithms=["HS256"])
+            uid = int(payload.get("sub", 0))
+            user = db.query(User).filter(User.id == uid).first()
+            if user and user.is_admin:
+                use_test = True
+        except Exception:
+            pass
+
+    if use_test and STRIPE_TEST_PUBLISHABLE:
+        return {"publishable_key": STRIPE_TEST_PUBLISHABLE, "test_mode": True}
+
     key = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
     if key.startswith("pk_test_your"):
         key = ""
-    return {"publishable_key": key}
+    return {"publishable_key": key, "test_mode": False}
 
 
 if __name__ == "__main__":
