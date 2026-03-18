@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import SEO from '../components/SEO'
 
-const PHONE = '17205938387'
+const PHONE = '17204537336'
 const EMAIL = 'bookings@travelvntours.com'
-const WHATSAPP = '14028714609'
+const WHATSAPP = '17204537336'
 
 export default function About() {
   const { t } = useTranslation()

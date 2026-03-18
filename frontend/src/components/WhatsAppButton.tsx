@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-const PHONE = '14028714609'
+const PHONE = '17204537336'
 
 export default function WhatsAppButton() {
   const { t } = useTranslation()
