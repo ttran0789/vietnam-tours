@@ -81,7 +81,7 @@ export default function About() {
                 <span className="contact-icon">&#9742;</span>
                 <div>
                   <span className="contact-label">{t('about.phone')}</span>
-                  <a href={`tel:+${PHONE}`}>+1 (720) 593-8387</a>
+                  <a href={`tel:+${PHONE}`}>+1 (720) 453-7336</a>
                 </div>
               </div>
 
