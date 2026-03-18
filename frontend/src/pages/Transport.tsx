@@ -140,15 +140,17 @@ export default function Transport() {
                         />
                       </label>
 
-                      <label>
-                        {t('transport.pickup')}
-                        <input
-                          type="text"
-                          value={pickup}
-                          onChange={e => setPickup(e.target.value)}
-                          placeholder={t('transport.pickupPlaceholder')}
-                        />
-                      </label>
+                      {selectedRoute.vehicle_type === 'Private Car' && (
+                        <label>
+                          {t('transport.pickup')}
+                          <input
+                            type="text"
+                            value={pickup}
+                            onChange={e => setPickup(e.target.value)}
+                            placeholder={t('transport.pickupPlaceholder')}
+                          />
+                        </label>
+                      )}
 
                       <label>
                         {t('tour.comments')}
