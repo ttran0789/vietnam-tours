@@ -17,6 +17,8 @@ interface TaxiQuote {
 }
 
 function TaxiCalculator() {
+  const { user } = useAuth()
+  const isStaff = user?.role === 'admin' || user?.role === 'employee'
   const [locations, setLocations] = useState<string[]>([])
   const [origin, setOrigin] = useState('')
   const [destination, setDestination] = useState('')
@@ -108,10 +110,12 @@ function TaxiCalculator() {
               <span className="taxi-detail-label">Est. Drive Time</span>
               <span className="taxi-detail-value">{quote.driving_hours ? `${quote.driving_hours} hours` : 'N/A'}</span>
             </div>
-            <div className="taxi-detail">
-              <span className="taxi-detail-label">Rate</span>
-              <span className="taxi-detail-value">${quote.rate_per_mile.toFixed(2)}/mile</span>
-            </div>
+            {isStaff && (
+              <div className="taxi-detail">
+                <span className="taxi-detail-label">Rate</span>
+                <span className="taxi-detail-value">${quote.rate_per_mile.toFixed(2)}/mile</span>
+              </div>
+            )}
           </div>
           <div className="taxi-total">
             <span>Estimated Total</span>
