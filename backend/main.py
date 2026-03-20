@@ -904,6 +904,24 @@ def admin_conversations(admin: User = Depends(require_admin), db: Session = Depe
     return conversations
 
 
+@app.get("/api/admin/chat/unread-count")
+def admin_chat_unread(admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """Count conversations where the last message is from a user (needs reply)."""
+    from sqlalchemy import distinct
+    conv_ids = db.query(distinct(ChatMessage.conversation_id)).all()
+    count = 0
+    for (conv_id,) in conv_ids:
+        last_msg = (
+            db.query(ChatMessage)
+            .filter(ChatMessage.conversation_id == conv_id)
+            .order_by(ChatMessage.created_at.desc())
+            .first()
+        )
+        if last_msg and last_msg.sender != "admin":
+            count += 1
+    return {"unread": count}
+
+
 @app.post("/api/admin/chat/reply")
 async def admin_chat_reply(request: Request, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     """Admin sends a reply to a conversation."""

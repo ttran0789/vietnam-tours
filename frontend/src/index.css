@@ -63,6 +63,17 @@ a { color: var(--primary); text-decoration: none; }
 .nav-user-link { color: var(--text-light) !important; font-size: 0.9rem !important; }
 .nav-user-link:hover { color: var(--primary) !important; }
 
+.nav-badge {
+  background: #e53e3e;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  vertical-align: top;
+}
+
 /* Hamburger button - hidden on desktop */
 .nav-hamburger {
   display: none;

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
@@ -9,11 +9,29 @@ export default function Navbar() {
   const { user, logout } = useAuth()
   const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [unread, setUnread] = useState(0)
   const location = useLocation()
+  const isStaff = user?.role === 'admin' || user?.role === 'employee'
 
   const closeMenu = () => setMenuOpen(false)
 
-  // Close menu on route change
+  useEffect(() => {
+    if (!isStaff) return
+    const fetchUnread = () => {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      fetch('/api/admin/chat/unread-count', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if (data) setUnread(data.unread) })
+        .catch(() => {})
+    }
+    fetchUnread()
+    const interval = setInterval(fetchUnread, 10000)
+    return () => clearInterval(interval)
+  }, [isStaff])
+
   const NavLink = ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => (
     <Link to={to} className={className} onClick={closeMenu}>{children}</Link>
   )
@@ -43,9 +61,12 @@ export default function Navbar() {
           {user ? (
             <>
               <NavLink to="/my-bookings">{t('nav.myBookings')}</NavLink>
-              {(user.role === 'admin' || user.role === 'employee') && (
+              {isStaff && (
                 <>
-                  <NavLink to="/admin/chat">Chat</NavLink>
+                  <NavLink to="/admin/chat">
+                    Chat
+                    {unread > 0 && <span className="nav-badge">{unread}</span>}
+                  </NavLink>
                   <NavLink to="/admin/bookings">{t('nav.admin')}</NavLink>
                 </>
               )}
