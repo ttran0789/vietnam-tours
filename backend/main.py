@@ -338,16 +338,15 @@ async def taxi_quote(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Origin and destination must be different")
     result = get_distance(origin, destination)
     if not result:
-        raise HTTPException(status_code=400, detail="Route not available. Contact us for a custom quote.")
-    distance_miles, driving_hours = result
+        raise HTTPException(status_code=400, detail="Could not calculate route. Please try different locations.")
     cfg = db.query(SiteConfig).filter(SiteConfig.key == "taxi_rate_per_mile").first()
     rate = float(cfg.value) if cfg else 1.60
-    total_price = round(distance_miles * rate, 2)
+    total_price = round(result['distance_miles'] * rate, 2)
     return {
         "origin": origin,
         "destination": destination,
-        "distance_miles": distance_miles,
-        "driving_hours": driving_hours,
+        "distance_miles": result['distance_miles'],
+        "driving_hours": result['duration_hours'],
         "rate_per_mile": rate,
         "total_price": total_price,
     }

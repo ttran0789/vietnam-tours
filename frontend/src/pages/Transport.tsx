@@ -11,7 +11,7 @@ interface TaxiQuote {
   origin: string
   destination: string
   distance_miles: number
-  driving_hours: number
+  driving_hours: number | null
   rate_per_mile: number
   total_price: number
 }
@@ -106,7 +106,7 @@ function TaxiCalculator() {
             </div>
             <div className="taxi-detail">
               <span className="taxi-detail-label">Est. Drive Time</span>
-              <span className="taxi-detail-value">{quote.driving_hours} hours</span>
+              <span className="taxi-detail-value">{quote.driving_hours ? `${quote.driving_hours} hours` : 'N/A'}</span>
             </div>
             <div className="taxi-detail">
               <span className="taxi-detail-label">Rate</span>
