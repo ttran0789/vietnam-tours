@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import SEO from '../components/SEO'
-import AdminNav from '../components/AdminNav'
 
 const API = '/api'
 const headers = () => ({
@@ -94,7 +93,6 @@ export default function AdminChat() {
 
   return (
     <div className="container">
-      <AdminNav />
       <SEO title="Chat" />
       <h1 className="page-title">Live Chat</h1>
 

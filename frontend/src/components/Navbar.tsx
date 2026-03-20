@@ -44,7 +44,10 @@ export default function Navbar() {
             <>
               <NavLink to="/my-bookings">{t('nav.myBookings')}</NavLink>
               {(user.role === 'admin' || user.role === 'employee') && (
-                <NavLink to="/admin/bookings">{t('nav.admin')}</NavLink>
+                <>
+                  <NavLink to="/admin/chat">Chat</NavLink>
+                  <NavLink to="/admin/bookings">{t('nav.admin')}</NavLink>
+                </>
               )}
               <NavLink to="/profile" className="nav-user-link">{t('nav.greeting', { name: user.name })}</NavLink>
               <button onClick={() => { logout(); closeMenu() }} className="btn btn-outline btn-sm">{t('nav.logout')}</button>

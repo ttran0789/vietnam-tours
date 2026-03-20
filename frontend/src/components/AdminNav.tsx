@@ -7,7 +7,6 @@ const links = [
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/images', label: 'Photos' },
   { to: '/admin/pricing', label: 'Pricing', superOnly: true },
-  { to: '/admin/chat', label: 'Chat' },
 ]
 
 export default function AdminNav() {
