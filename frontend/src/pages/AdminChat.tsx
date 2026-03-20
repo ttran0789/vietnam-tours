@@ -56,6 +56,8 @@ export default function AdminChat() {
   useEffect(() => {
     if (selected) {
       loadMessages(selected)
+      // Mark as read
+      fetch(`${API}/admin/chat/read/${selected}`, { method: 'POST', headers: headers() }).catch(() => {})
       pollRef.current = setInterval(() => loadMessages(selected), 3000)
       return () => clearInterval(pollRef.current)
     }

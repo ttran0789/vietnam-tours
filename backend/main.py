@@ -11,7 +11,7 @@ import json
 load_dotenv()
 
 from database import engine, Base, get_db
-from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review, ChatMessage, SiteConfig
+from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review, ChatMessage, ChatReadReceipt, SiteConfig
 from schemas import (
     UserCreate, UserLogin, UserResponse, TokenResponse,
     TourResponse, BookingCreate, BookingResponse, BookingAdminAction,
@@ -970,20 +970,35 @@ def admin_conversations(admin: User = Depends(require_admin), db: Session = Depe
 
 @app.get("/api/admin/chat/unread-count")
 def admin_chat_unread(admin: User = Depends(require_admin), db: Session = Depends(get_db)):
-    """Count conversations where the last message is from a user (needs reply)."""
+    """Count conversations with user messages newer than last admin read."""
     from sqlalchemy import distinct
     conv_ids = db.query(distinct(ChatMessage.conversation_id)).all()
     count = 0
     for (conv_id,) in conv_ids:
-        last_msg = (
+        last_user_msg = (
             db.query(ChatMessage)
-            .filter(ChatMessage.conversation_id == conv_id)
+            .filter(ChatMessage.conversation_id == conv_id, ChatMessage.sender == "user")
             .order_by(ChatMessage.created_at.desc())
             .first()
         )
-        if last_msg and last_msg.sender != "admin":
+        if not last_user_msg:
+            continue
+        receipt = db.query(ChatReadReceipt).filter(ChatReadReceipt.conversation_id == conv_id).first()
+        if not receipt or (last_user_msg.created_at and receipt.read_at and last_user_msg.created_at > receipt.read_at):
             count += 1
     return {"unread": count}
+
+
+@app.post("/api/admin/chat/read/{conversation_id}")
+def mark_chat_read(conversation_id: str, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """Mark a conversation as read."""
+    receipt = db.query(ChatReadReceipt).filter(ChatReadReceipt.conversation_id == conversation_id).first()
+    if receipt:
+        receipt.read_at = datetime.now(timezone.utc)
+    else:
+        db.add(ChatReadReceipt(conversation_id=conversation_id, read_at=datetime.now(timezone.utc)))
+    db.commit()
+    return {"detail": "Marked as read"}
 
 
 @app.post("/api/admin/chat/reply")

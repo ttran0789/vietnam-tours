@@ -130,6 +130,13 @@ class SiteConfig(Base):
     value = Column(String, nullable=False)
 
 
+class ChatReadReceipt(Base):
+    __tablename__ = "chat_read_receipts"
+
+    conversation_id = Column(String, primary_key=True)
+    read_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
 
