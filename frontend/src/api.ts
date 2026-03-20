@@ -86,6 +86,8 @@ export const api = {
   // Admin
   getAdminStats: () => request('/admin/stats'),
   getAdminUsers: () => request('/admin/users'),
+  updateUserRole: (userId: number, role: string) =>
+    request(`/admin/users/${userId}/role`, { method: 'PUT', body: JSON.stringify({ role }) }),
   getAdminUpcoming: () => request('/admin/upcoming'),
 
   updateTourPrice: (tourId: number, price: number) =>

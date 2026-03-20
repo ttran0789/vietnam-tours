@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api'
+import { useAuth } from '../context/AuthContext'
 import SEO from '../components/SEO'
 import AdminNav from '../components/AdminNav'
 
@@ -19,13 +20,24 @@ interface AdminUser {
 }
 
 export default function AdminUsers() {
+  const { user: currentUser } = useAuth()
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const isSuperAdmin = currentUser?.role === 'admin'
 
   useEffect(() => {
     api.getAdminUsers().then((data: any) => setUsers(data)).finally(() => setLoading(false))
   }, [])
+
+  const handleRoleChange = async (userId: number, newRole: string) => {
+    try {
+      await api.updateUserRole(userId, newRole)
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
+    } catch (err: any) {
+      alert(err.message || 'Failed to update role')
+    }
+  }
 
   const filtered = users.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -58,6 +70,7 @@ export default function AdminUsers() {
               <th>Phone</th>
               <th>WhatsApp</th>
               <th>Nationality</th>
+              {isSuperAdmin && <th>Role</th>}
               <th>Bookings</th>
               <th>Joined</th>
             </tr>
@@ -67,13 +80,26 @@ export default function AdminUsers() {
               <tr key={user.id}>
                 <td>
                   <strong>{user.name}</strong>
-                  {user.role === 'admin' && <span className="stock-badge" style={{ marginLeft: 6 }}>Admin</span>}
-                  {user.role === 'employee' && <span className="stock-badge" style={{ marginLeft: 6, background: '#2196F3' }}>Employee</span>}
+                  {!isSuperAdmin && user.role === 'admin' && <span className="stock-badge" style={{ marginLeft: 6 }}>Admin</span>}
+                  {!isSuperAdmin && user.role === 'employee' && <span className="stock-badge" style={{ marginLeft: 6, background: '#2196F3' }}>Employee</span>}
                 </td>
                 <td>{user.email}</td>
                 <td>{user.phone || '-'}</td>
                 <td>{user.whatsapp || '-'}</td>
                 <td>{user.nationality || '-'}</td>
+                {isSuperAdmin && (
+                  <td>
+                    <select
+                      value={user.role}
+                      onChange={e => handleRoleChange(user.id, e.target.value)}
+                      style={{ padding: '4px 8px', borderRadius: 4, border: '1px solid #ccc' }}
+                    >
+                      <option value="user">User</option>
+                      <option value="employee">Employee</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
+                )}
                 <td>{user.tour_bookings + user.transport_bookings}</td>
                 <td>{user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</td>
               </tr>
