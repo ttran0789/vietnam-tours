@@ -137,7 +137,7 @@ function TaxiCalculator() {
 }
 
 export default function Transport() {
-  const [tab, setTab] = useState<'routes' | 'taxi'>('routes')
+  const [tab, setTab] = useState<'routes' | 'taxi'>('taxi')
   const [routes, setRoutes] = useState<TransportRoute[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedRoute, setSelectedRoute] = useState<TransportRoute | null>(null)
@@ -195,16 +195,16 @@ export default function Transport() {
       <div className="container">
         <div className="transport-tabs">
           <button
-            className={`transport-tab ${tab === 'routes' ? 'transport-tab-active' : ''}`}
-            onClick={() => setTab('routes')}
-          >
-            Scheduled Routes
-          </button>
-          <button
             className={`transport-tab ${tab === 'taxi' ? 'transport-tab-active' : ''}`}
             onClick={() => setTab('taxi')}
           >
             Private Taxi
+          </button>
+          <button
+            className={`transport-tab ${tab === 'routes' ? 'transport-tab-active' : ''}`}
+            onClick={() => setTab('routes')}
+          >
+            Scheduled Routes
           </button>
         </div>
 
