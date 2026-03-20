@@ -11,7 +11,7 @@ import json
 load_dotenv()
 
 from database import engine, Base, get_db
-from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review, ChatMessage, ChatReadReceipt, SiteConfig
+from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review, ChatMessage, ChatReadReceipt, SiteConfig, TaxiBooking
 from schemas import (
     UserCreate, UserLogin, UserResponse, TokenResponse,
     TourResponse, BookingCreate, BookingResponse, BookingAdminAction,
@@ -350,6 +350,122 @@ async def taxi_quote(request: Request, db: Session = Depends(get_db)):
         "rate_per_mile": rate,
         "total_price": total_price,
     }
+
+
+# ── Taxi Bookings ────────────────────────────────────────────────────────
+
+@app.post("/api/taxi/bookings")
+async def create_taxi_booking(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    data = await request.json()
+    origin = data.get("origin", "").strip()
+    destination = data.get("destination", "").strip()
+    travel_date = data.get("travel_date", "")
+    num_passengers = data.get("num_passengers", 1)
+    comments = data.get("comments", "")
+
+    if not origin or not destination or not travel_date:
+        raise HTTPException(status_code=400, detail="Origin, destination, and travel date required")
+
+    result = get_distance(origin, destination)
+    if not result:
+        raise HTTPException(status_code=400, detail="Could not calculate route")
+
+    cfg = db.query(SiteConfig).filter(SiteConfig.key == "taxi_rate_per_mile").first()
+    rate = float(cfg.value) if cfg else 1.60
+    total_price = round(result['distance_miles'] * rate, 2)
+
+    status = BookingStatus.APPROVED if is_instant_booking(travel_date) else BookingStatus.PENDING
+
+    booking = TaxiBooking(
+        user_id=user.id,
+        origin=origin,
+        destination=destination,
+        travel_date=travel_date,
+        num_passengers=num_passengers,
+        distance_miles=result['distance_miles'],
+        driving_hours=result.get('duration_hours'),
+        total_price=total_price,
+        status=status,
+        comments=comments,
+    )
+    db.add(booking)
+    db.commit()
+    db.refresh(booking)
+
+    send_booking_submitted(user.email, user.name, f"Private Taxi: {origin} → {destination}", travel_date, total_price)
+
+    return {
+        "id": booking.id,
+        "status": booking.status,
+        "total_price": booking.total_price,
+        "instant": status == BookingStatus.APPROVED,
+    }
+
+
+@app.get("/api/taxi/bookings")
+def get_taxi_bookings(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    bookings = db.query(TaxiBooking).filter(TaxiBooking.user_id == user.id).order_by(TaxiBooking.created_at.desc()).all()
+    return [
+        {
+            "id": b.id, "origin": b.origin, "destination": b.destination,
+            "travel_date": b.travel_date, "num_passengers": b.num_passengers,
+            "distance_miles": b.distance_miles, "driving_hours": b.driving_hours,
+            "total_price": b.total_price, "status": b.status,
+            "comments": b.comments, "admin_notes": b.admin_notes,
+            "created_at": b.created_at.isoformat() if b.created_at else None,
+        }
+        for b in bookings
+    ]
+
+
+@app.get("/api/admin/taxi/bookings")
+def admin_taxi_bookings(admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    bookings = db.query(TaxiBooking).order_by(TaxiBooking.created_at.desc()).all()
+    return [
+        {
+            "id": b.id, "origin": b.origin, "destination": b.destination,
+            "travel_date": b.travel_date, "num_passengers": b.num_passengers,
+            "distance_miles": b.distance_miles, "driving_hours": b.driving_hours,
+            "total_price": b.total_price, "status": b.status,
+            "comments": b.comments, "admin_notes": b.admin_notes,
+            "customer_name": b.user.name if b.user else "",
+            "customer_email": b.user.email if b.user else "",
+            "customer_phone": b.user.phone or "" if b.user else "",
+            "customer_whatsapp": b.user.whatsapp or "" if b.user else "",
+            "created_at": b.created_at.isoformat() if b.created_at else None,
+        }
+        for b in bookings
+    ]
+
+
+@app.put("/api/admin/taxi/bookings/{booking_id}/approve")
+async def approve_taxi_booking(booking_id: int, request: Request, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    data = await request.json()
+    booking = db.query(TaxiBooking).filter(TaxiBooking.id == booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    booking.status = BookingStatus.APPROVED
+    booking.admin_notes = data.get("admin_notes", "")
+    db.commit()
+    user = db.query(User).filter(User.id == booking.user_id).first()
+    if user:
+        send_booking_approved(user.email, user.name, f"Private Taxi: {booking.origin} → {booking.destination}", booking.travel_date)
+    return {"detail": "Approved"}
+
+
+@app.put("/api/admin/taxi/bookings/{booking_id}/reject")
+async def reject_taxi_booking(booking_id: int, request: Request, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    data = await request.json()
+    booking = db.query(TaxiBooking).filter(TaxiBooking.id == booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    booking.status = BookingStatus.REJECTED
+    booking.admin_notes = data.get("admin_notes", "")
+    db.commit()
+    user = db.query(User).filter(User.id == booking.user_id).first()
+    if user:
+        send_booking_rejected(user.email, user.name, f"Private Taxi: {booking.origin} → {booking.destination}", booking.travel_date, booking.admin_notes)
+    return {"detail": "Rejected"}
 
 
 # ── Tours ────────────────────────────────────────────────────────────────

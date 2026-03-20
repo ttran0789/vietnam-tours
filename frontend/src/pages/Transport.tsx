@@ -18,12 +18,21 @@ interface TaxiQuote {
 
 function TaxiCalculator() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const isStaff = user?.role === 'admin' || user?.role === 'employee'
   const [locations, setLocations] = useState<string[]>([])
   const [origin, setOrigin] = useState('Hanoi')
   const [destination, setDestination] = useState('Ninh Binh')
+  const [travelDate, setTravelDate] = useState(() => {
+    const d = new Date()
+    d.setDate(d.getDate() + 3)
+    return d.toISOString().split('T')[0]
+  })
+  const [numPassengers, setNumPassengers] = useState(1)
+  const [comments, setComments] = useState('')
   const [quote, setQuote] = useState<TaxiQuote | null>(null)
   const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -45,6 +54,25 @@ function TaxiCalculator() {
     }
   }
 
+  const handleBook = async () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+    if (!quote || !travelDate) return
+    setSubmitting(true)
+    setError('')
+    try {
+      await api.createTaxiBooking(origin, destination, travelDate, numPassengers, comments)
+      navigate('/booking-confirmed')
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const instant = isInstantBooking(travelDate)
   const WHATSAPP = '17204537336'
 
   return (
@@ -84,6 +112,30 @@ function TaxiCalculator() {
           </label>
         </div>
 
+        <label style={{ marginTop: '1rem', display: 'block', fontWeight: 600, fontSize: '0.9rem' }}>
+          Travel Date
+          <input
+            type="date"
+            value={travelDate}
+            onChange={e => setTravelDate(e.target.value)}
+            min={new Date().toISOString().split('T')[0]}
+            style={{ width: '100%', marginTop: '0.25rem' }}
+          />
+        </label>
+
+        <label style={{ marginTop: '0.75rem', display: 'block', fontWeight: 600, fontSize: '0.9rem' }}>
+          Passengers
+          <select
+            value={numPassengers}
+            onChange={e => setNumPassengers(Number(e.target.value))}
+            style={{ width: '100%', marginTop: '0.25rem' }}
+          >
+            {[1, 2, 3, 4, 5, 6].map(n => (
+              <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>
+            ))}
+          </select>
+        </label>
+
         <button
           className="btn btn-primary"
           onClick={handleQuote}
@@ -104,7 +156,7 @@ function TaxiCalculator() {
           <div className="taxi-details">
             <div className="taxi-detail">
               <span className="taxi-detail-label">Distance</span>
-              <span className="taxi-detail-value">{quote.distance_miles} miles</span>
+              <span className="taxi-detail-value">{quote.distance_miles} mi / {Math.round(quote.distance_miles * 1.60934)} km</span>
             </div>
             <div className="taxi-detail">
               <span className="taxi-detail-label">Est. Drive Time</span>
@@ -121,15 +173,40 @@ function TaxiCalculator() {
             <span>Estimated Total</span>
             <span className="taxi-total-price">${quote.total_price.toFixed(2)}</span>
           </div>
-          <p className="taxi-note">Price is for a 7-seater SUV (up to 6 passengers). Contact us to book.</p>
-          <a
-            href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hi! I'd like to book a private taxi from ${quote.origin} to ${quote.destination}.`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary btn-block"
-          >
-            Book via WhatsApp
-          </a>
+          <p className="taxi-note">Price is for a 7-seater SUV (up to 6 passengers).</p>
+
+          <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.75rem' }}>
+            Comments (optional)
+            <textarea
+              value={comments}
+              onChange={e => setComments(e.target.value)}
+              placeholder="Pickup address, special requests..."
+              rows={2}
+              style={{ width: '100%', marginTop: '0.25rem' }}
+            />
+          </label>
+
+          {instant ? (
+            <button
+              className="btn btn-primary btn-block"
+              onClick={handleBook}
+              disabled={submitting}
+            >
+              {submitting ? 'Booking...' : !user ? 'Login to Book' : 'Book Now'}
+            </button>
+          ) : (
+            <a
+              href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hi! I'd like to book a private taxi from ${quote.origin} to ${quote.destination} on ${travelDate} for ${numPassengers} passenger${numPassengers > 1 ? 's' : ''}.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary btn-block"
+            >
+              Contact via WhatsApp to Book
+            </a>
+          )}
+          <p className="booking-note" style={{ marginTop: '0.5rem' }}>
+            {instant ? 'Your booking will be confirmed instantly.' : 'For trips within 3 days, please contact us directly via WhatsApp.'}
+          </p>
         </div>
       )}
     </div>

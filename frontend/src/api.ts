@@ -182,6 +182,14 @@ export const api = {
       '/taxi/quote', { method: 'POST', body: JSON.stringify({ origin, destination }) }
     ),
 
+  createTaxiBooking: (origin: string, destination: string, travelDate: string, numPassengers: number, comments: string) =>
+    request('/taxi/bookings', {
+      method: 'POST',
+      body: JSON.stringify({ origin, destination, travel_date: travelDate, num_passengers: numPassengers, comments }),
+    }),
+
+  getTaxiBookings: () => request('/taxi/bookings'),
+
   // Admin config
   getConfig: (key: string) => request<{ key: string; value: string }>(`/admin/config/${key}`),
   updateConfig: (key: string, value: string) =>

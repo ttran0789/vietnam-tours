@@ -123,6 +123,27 @@ class Review(Base):
     tour = relationship("Tour", backref="reviews")
 
 
+class TaxiBooking(Base):
+    __tablename__ = "taxi_bookings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    origin = Column(String, nullable=False)
+    destination = Column(String, nullable=False)
+    travel_date = Column(String, nullable=False)
+    num_passengers = Column(Integer, default=1)
+    distance_miles = Column(Float, nullable=False)
+    driving_hours = Column(Float)
+    total_price = Column(Float, nullable=False)
+    status = Column(String, default=BookingStatus.PENDING)
+    comments = Column(Text, default="")
+    admin_notes = Column(Text, default="")
+    stripe_payment_intent_id = Column(String)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", backref="taxi_bookings")
+
+
 class SiteConfig(Base):
     __tablename__ = "site_config"
 
