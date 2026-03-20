@@ -16,24 +16,24 @@ _driving_cache: dict = {}
 
 # Popular Vietnam locations for the dropdown
 LOCATIONS = [
-    "Hanoi",
-    "Ha Giang",
+    "Can Tho",
+    "Cao Bang",
+    "Da Lat",
+    "Da Nang",
     "Dong Van",
-    "Sapa",
-    "Ninh Binh",
+    "Ha Giang",
     "Ha Long Bay",
     "Hai Phong",
-    "Mai Chau",
-    "Cao Bang",
-    "Phong Nha",
-    "Hue",
-    "Da Nang",
-    "Hoi An",
-    "Nha Trang",
-    "Da Lat",
+    "Hanoi",
     "Ho Chi Minh City",
-    "Can Tho",
+    "Hoi An",
+    "Hue",
+    "Mai Chau",
+    "Nha Trang",
+    "Ninh Binh",
+    "Phong Nha",
     "Phu Quoc",
+    "Sapa",
 ]
 
 
