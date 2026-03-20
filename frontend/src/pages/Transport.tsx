@@ -121,7 +121,7 @@ function TaxiCalculator() {
             <span>Estimated Total</span>
             <span className="taxi-total-price">${quote.total_price.toFixed(2)}</span>
           </div>
-          <p className="taxi-note">Price is for a private car (up to 4 passengers). Contact us to book.</p>
+          <p className="taxi-note">Price is for a 7-seater SUV (up to 6 passengers). Contact us to book.</p>
           <a
             href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hi! I'd like to book a private taxi from ${quote.origin} to ${quote.destination}.`)}`}
             target="_blank"
