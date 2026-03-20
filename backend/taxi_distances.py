@@ -32,7 +32,6 @@ LOCATIONS = [
     "Nha Trang",
     "Ninh Binh",
     "Phong Nha",
-    "Phu Quoc",
     "Sapa",
 ]
 
