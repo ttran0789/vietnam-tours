@@ -20,8 +20,8 @@ function TaxiCalculator() {
   const { user } = useAuth()
   const isStaff = user?.role === 'admin' || user?.role === 'employee'
   const [locations, setLocations] = useState<string[]>([])
-  const [origin, setOrigin] = useState('')
-  const [destination, setDestination] = useState('')
+  const [origin, setOrigin] = useState('Hanoi')
+  const [destination, setDestination] = useState('Ninh Binh')
   const [quote, setQuote] = useState<TaxiQuote | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
