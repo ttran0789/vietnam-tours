@@ -3,6 +3,7 @@ export interface User {
   email: string
   name: string
   is_admin: boolean
+  role: string
   phone: string
   whatsapp: string
   zalo: string

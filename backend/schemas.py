@@ -19,6 +19,7 @@ class UserResponse(BaseModel):
     email: str
     name: str
     is_admin: bool = False
+    role: str = "user"
     phone: str = ""
     whatsapp: str = ""
     zalo: str = ""

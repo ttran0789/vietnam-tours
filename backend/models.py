@@ -21,6 +21,7 @@ class User(Base):
     name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
+    role = Column(String, default="user")  # "user", "employee", "admin"
     phone = Column(String, default="")
     whatsapp = Column(String, default="")
     zalo = Column(String, default="")

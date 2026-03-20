@@ -27,11 +27,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return user ? <>{children}</> : <Navigate to="/login" />
 }
 
-function AdminRoute({ children }: { children: React.ReactNode }) {
+function AdminRoute({ children, superOnly }: { children: React.ReactNode; superOnly?: boolean }) {
   const { user, loading } = useAuth()
   if (loading) return <div className="loading">Loading...</div>
   if (!user) return <Navigate to="/login" />
-  if (!user.is_admin) return <Navigate to="/" />
+  const isStaff = user.role === 'admin' || user.role === 'employee'
+  if (!isStaff) return <Navigate to="/" />
+  if (superOnly && user.role !== 'admin') return <Navigate to="/admin/bookings" />
   return <>{children}</>
 }
 
@@ -57,7 +59,7 @@ export default function App() {
           <Route path="/admin/images" element={<AdminRoute><AdminImages /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
           <Route path="/admin/upcoming" element={<AdminRoute><AdminUpcoming /></AdminRoute>} />
-          <Route path="/admin/pricing" element={<AdminRoute><AdminPricing /></AdminRoute>} />
+          <Route path="/admin/pricing" element={<AdminRoute superOnly><AdminPricing /></AdminRoute>} />
           <Route path="/admin/chat" element={<AdminRoute><AdminChat /></AdminRoute>} />
         </Routes>
       </main>

@@ -12,6 +12,7 @@ interface AdminUser {
   zalo: string
   nationality: string
   is_admin: boolean
+  role: string
   created_at: string | null
   tour_bookings: number
   transport_bookings: number
@@ -66,7 +67,8 @@ export default function AdminUsers() {
               <tr key={user.id}>
                 <td>
                   <strong>{user.name}</strong>
-                  {user.is_admin && <span className="stock-badge" style={{ marginLeft: 6 }}>Admin</span>}
+                  {user.role === 'admin' && <span className="stock-badge" style={{ marginLeft: 6 }}>Admin</span>}
+                  {user.role === 'employee' && <span className="stock-badge" style={{ marginLeft: 6, background: '#2196F3' }}>Employee</span>}
                 </td>
                 <td>{user.email}</td>
                 <td>{user.phone || '-'}</td>

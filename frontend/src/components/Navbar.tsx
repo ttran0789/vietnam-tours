@@ -43,7 +43,7 @@ export default function Navbar() {
           {user ? (
             <>
               <NavLink to="/my-bookings">{t('nav.myBookings')}</NavLink>
-              {user.is_admin && (
+              {(user.role === 'admin' || user.role === 'employee') && (
                 <NavLink to="/admin/bookings">{t('nav.admin')}</NavLink>
               )}
               <NavLink to="/profile" className="nav-user-link">{t('nav.greeting', { name: user.name })}</NavLink>

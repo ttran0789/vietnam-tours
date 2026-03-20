@@ -29,6 +29,16 @@ from telegram_service import notify_new_chat, send_telegram, BOT_TOKEN
 from seed_data import seed
 
 Base.metadata.create_all(bind=engine)
+
+# Migration: add role column to existing databases
+from sqlalchemy import inspect as sa_inspect, text
+with engine.connect() as conn:
+    cols = [c["name"] for c in sa_inspect(engine).get_columns("users")]
+    if "role" not in cols:
+        conn.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR DEFAULT 'user'"))
+        conn.execute(text("UPDATE users SET role = 'admin' WHERE is_admin = 1"))
+        conn.commit()
+
 seed()
 
 app = FastAPI(title="Vietnam Tours API")
@@ -66,8 +76,14 @@ def is_instant_booking(date_str: str) -> bool:
 
 
 def require_admin(user: User = Depends(get_current_user)) -> User:
-    if not user.is_admin:
+    if user.role not in ("admin", "employee"):
         raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+
+def require_super_admin(user: User = Depends(get_current_user)) -> User:
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
     return user
 
 
@@ -174,6 +190,7 @@ def admin_list_users(admin: User = Depends(require_admin), db: Session = Depends
             "zalo": u.zalo or "",
             "nationality": u.nationality or "",
             "is_admin": u.is_admin,
+            "role": u.role or ("admin" if u.is_admin else "user"),
             "created_at": u.created_at.isoformat() if u.created_at else None,
             "tour_bookings": db.query(Booking).filter(Booking.user_id == u.id).count(),
             "transport_bookings": db.query(TransportBooking).filter(TransportBooking.user_id == u.id).count(),
@@ -235,7 +252,7 @@ def admin_upcoming(admin: User = Depends(require_admin), db: Session = Depends(g
 # ── Admin Pricing ────────────────────────────────────────────────────────
 
 @app.put("/api/admin/tours/{tour_id}/price")
-async def update_tour_price(tour_id: int, request: Request, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+async def update_tour_price(tour_id: int, request: Request, admin: User = Depends(require_super_admin), db: Session = Depends(get_db)):
     data = await request.json()
     tour = db.query(Tour).filter(Tour.id == tour_id).first()
     if not tour:
@@ -246,7 +263,7 @@ async def update_tour_price(tour_id: int, request: Request, admin: User = Depend
 
 
 @app.put("/api/admin/transport/{route_id}/price")
-async def update_transport_price(route_id: int, request: Request, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+async def update_transport_price(route_id: int, request: Request, admin: User = Depends(require_super_admin), db: Session = Depends(get_db)):
     data = await request.json()
     route = db.query(TransportRoute).filter(TransportRoute.id == route_id).first()
     if not route:
