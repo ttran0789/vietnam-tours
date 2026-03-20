@@ -175,6 +175,18 @@ export const api = {
       body: JSON.stringify({ enabled, disabled_stock: disabledStock, cover }),
     }),
 
+  // Taxi
+  getTaxiLocations: () => request<string[]>('/taxi/locations'),
+  getTaxiQuote: (origin: string, destination: string) =>
+    request<{ origin: string; destination: string; distance_miles: number; driving_hours: number; rate_per_mile: number; total_price: number }>(
+      '/taxi/quote', { method: 'POST', body: JSON.stringify({ origin, destination }) }
+    ),
+
+  // Admin config
+  getConfig: (key: string) => request<{ key: string; value: string }>(`/admin/config/${key}`),
+  updateConfig: (key: string, value: string) =>
+    request(`/admin/config/${key}`, { method: 'PUT', body: JSON.stringify({ value }) }),
+
   createPaymentIntent: (bookingId: number, bookingType: string = 'tour') =>
     request<{ client_secret: string }>('/payments/create-intent', {
       method: 'POST',

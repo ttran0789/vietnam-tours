@@ -7,7 +7,133 @@ import { useAuth } from '../context/AuthContext'
 import { isInstantBooking } from '../utils/booking'
 import SEO from '../components/SEO'
 
+interface TaxiQuote {
+  origin: string
+  destination: string
+  distance_miles: number
+  driving_hours: number
+  rate_per_mile: number
+  total_price: number
+}
+
+function TaxiCalculator() {
+  const [locations, setLocations] = useState<string[]>([])
+  const [origin, setOrigin] = useState('')
+  const [destination, setDestination] = useState('')
+  const [quote, setQuote] = useState<TaxiQuote | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    api.getTaxiLocations().then(setLocations)
+  }, [])
+
+  const handleQuote = async () => {
+    if (!origin || !destination) return
+    setLoading(true)
+    setError('')
+    setQuote(null)
+    try {
+      const q = await api.getTaxiQuote(origin, destination)
+      setQuote(q)
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const WHATSAPP = '17204537336'
+
+  return (
+    <div className="taxi-calculator">
+      <div className="taxi-form">
+        <h2 className="section-title-left">Private Taxi Quote</h2>
+        <p className="taxi-desc">Get an instant price estimate for a private car between any two destinations in Vietnam.</p>
+
+        <div className="taxi-inputs">
+          <label>
+            From
+            <select value={origin} onChange={e => setOrigin(e.target.value)}>
+              <option value="">Select origin</option>
+              {locations.filter(l => l !== destination).map(l => (
+                <option key={l} value={l}>{l}</option>
+              ))}
+            </select>
+          </label>
+
+          <button
+            className="taxi-swap"
+            onClick={() => { setOrigin(destination); setDestination(origin); setQuote(null) }}
+            disabled={!origin && !destination}
+            aria-label="Swap"
+          >
+            ⇄
+          </button>
+
+          <label>
+            To
+            <select value={destination} onChange={e => setDestination(e.target.value)}>
+              <option value="">Select destination</option>
+              {locations.filter(l => l !== origin).map(l => (
+                <option key={l} value={l}>{l}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <button
+          className="btn btn-primary"
+          onClick={handleQuote}
+          disabled={loading || !origin || !destination}
+          style={{ marginTop: '1rem' }}
+        >
+          {loading ? 'Calculating...' : 'Get Quote'}
+        </button>
+
+        {error && <div className="error-message" style={{ marginTop: '1rem' }}>{error}</div>}
+      </div>
+
+      {quote && (
+        <div className="taxi-result">
+          <div className="taxi-route-header">
+            <h3>{quote.origin} → {quote.destination}</h3>
+          </div>
+          <div className="taxi-details">
+            <div className="taxi-detail">
+              <span className="taxi-detail-label">Distance</span>
+              <span className="taxi-detail-value">{quote.distance_miles} miles</span>
+            </div>
+            <div className="taxi-detail">
+              <span className="taxi-detail-label">Est. Drive Time</span>
+              <span className="taxi-detail-value">{quote.driving_hours} hours</span>
+            </div>
+            <div className="taxi-detail">
+              <span className="taxi-detail-label">Rate</span>
+              <span className="taxi-detail-value">${quote.rate_per_mile.toFixed(2)}/mile</span>
+            </div>
+          </div>
+          <div className="taxi-total">
+            <span>Estimated Total</span>
+            <span className="taxi-total-price">${quote.total_price.toFixed(2)}</span>
+          </div>
+          <p className="taxi-note">Price is for a private car (up to 4 passengers). Contact us to book.</p>
+          <a
+            href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hi! I'd like to book a private taxi from ${quote.origin} to ${quote.destination}.`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary btn-block"
+          >
+            Book via WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Transport() {
+  const [tab, setTab] = useState<'routes' | 'taxi'>('routes')
   const [routes, setRoutes] = useState<TransportRoute[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedRoute, setSelectedRoute] = useState<TransportRoute | null>(null)
@@ -63,7 +189,24 @@ export default function Transport() {
       </section>
 
       <div className="container">
-        {loading ? (
+        <div className="transport-tabs">
+          <button
+            className={`transport-tab ${tab === 'routes' ? 'transport-tab-active' : ''}`}
+            onClick={() => setTab('routes')}
+          >
+            Scheduled Routes
+          </button>
+          <button
+            className={`transport-tab ${tab === 'taxi' ? 'transport-tab-active' : ''}`}
+            onClick={() => setTab('taxi')}
+          >
+            Private Taxi
+          </button>
+        </div>
+
+        {tab === 'taxi' ? (
+          <TaxiCalculator />
+        ) : loading ? (
           <div className="loading">{t('tour.loading')}</div>
         ) : (
           <div className="transport-layout">

@@ -123,6 +123,13 @@ class Review(Base):
     tour = relationship("Tour", backref="reviews")
 
 
+class SiteConfig(Base):
+    __tablename__ = "site_config"
+
+    key = Column(String, primary_key=True)
+    value = Column(String, nullable=False)
+
+
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
 

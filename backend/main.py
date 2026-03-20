@@ -11,7 +11,7 @@ import json
 load_dotenv()
 
 from database import engine, Base, get_db
-from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review, ChatMessage
+from models import User, Tour, Booking, BookingStatus, TransportRoute, TransportBooking, Review, ChatMessage, SiteConfig
 from schemas import (
     UserCreate, UserLogin, UserResponse, TokenResponse,
     TourResponse, BookingCreate, BookingResponse, BookingAdminAction,
@@ -40,6 +40,14 @@ with engine.connect() as conn:
         conn.commit()
 
 seed()
+
+# Seed default site config
+from database import SessionLocal
+_db = SessionLocal()
+if not _db.query(SiteConfig).filter(SiteConfig.key == "taxi_rate_per_mile").first():
+    _db.add(SiteConfig(key="taxi_rate_per_mile", value="1.60"))
+    _db.commit()
+_db.close()
 
 app = FastAPI(title="Vietnam Tours API")
 
@@ -286,6 +294,63 @@ async def update_transport_price(route_id: int, request: Request, admin: User = 
     route.price = float(data["price"])
     db.commit()
     return {"detail": "Price updated", "price": route.price}
+
+
+# ── Admin Config ─────────────────────────────────────────────────────────
+
+@app.get("/api/admin/config/{key}")
+def get_config(key: str, admin: User = Depends(require_super_admin), db: Session = Depends(get_db)):
+    cfg = db.query(SiteConfig).filter(SiteConfig.key == key).first()
+    if not cfg:
+        raise HTTPException(status_code=404, detail="Config not found")
+    return {"key": cfg.key, "value": cfg.value}
+
+
+@app.put("/api/admin/config/{key}")
+async def update_config(key: str, request: Request, admin: User = Depends(require_super_admin), db: Session = Depends(get_db)):
+    data = await request.json()
+    cfg = db.query(SiteConfig).filter(SiteConfig.key == key).first()
+    if not cfg:
+        raise HTTPException(status_code=404, detail="Config not found")
+    cfg.value = str(data["value"])
+    db.commit()
+    return {"key": cfg.key, "value": cfg.value}
+
+
+# ── Private Taxi ────────────────────────────────────────────────────────
+
+from taxi_distances import get_locations, get_distance
+
+
+@app.get("/api/taxi/locations")
+def taxi_locations():
+    return get_locations()
+
+
+@app.post("/api/taxi/quote")
+async def taxi_quote(request: Request, db: Session = Depends(get_db)):
+    data = await request.json()
+    origin = data.get("origin", "").strip()
+    destination = data.get("destination", "").strip()
+    if not origin or not destination:
+        raise HTTPException(status_code=400, detail="Origin and destination required")
+    if origin == destination:
+        raise HTTPException(status_code=400, detail="Origin and destination must be different")
+    result = get_distance(origin, destination)
+    if not result:
+        raise HTTPException(status_code=400, detail="Route not available. Contact us for a custom quote.")
+    distance_miles, driving_hours = result
+    cfg = db.query(SiteConfig).filter(SiteConfig.key == "taxi_rate_per_mile").first()
+    rate = float(cfg.value) if cfg else 1.60
+    total_price = round(distance_miles * rate, 2)
+    return {
+        "origin": origin,
+        "destination": destination,
+        "distance_miles": distance_miles,
+        "driving_hours": driving_hours,
+        "rate_per_mile": rate,
+        "total_price": total_price,
+    }
 
 
 # ── Tours ────────────────────────────────────────────────────────────────

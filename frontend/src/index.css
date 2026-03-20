@@ -1436,6 +1436,46 @@ a { color: var(--primary); text-decoration: none; }
 }
 
 /* ── Transport ────────────────────────────────── */
+.transport-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+.transport-tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.transport-tab:hover { color: var(--primary); }
+.transport-tab-active { color: var(--primary); border-bottom-color: var(--primary); }
+
+/* Taxi Calculator */
+.taxi-calculator { max-width: 600px; }
+.taxi-desc { color: var(--text-light); margin-bottom: 1.5rem; }
+.taxi-inputs { display: flex; gap: 0.75rem; align-items: end; }
+.taxi-inputs label { flex: 1; font-weight: 600; font-size: 0.9rem; }
+.taxi-inputs select { width: 100%; padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; margin-top: 0.25rem; }
+.taxi-swap { background: var(--surface); border: 1px solid #d1d5db; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 2px; }
+.taxi-swap:hover { background: #e2e8f0; }
+
+.taxi-result { margin-top: 1.5rem; background: var(--surface); border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; }
+.taxi-route-header h3 { margin: 0 0 1rem; font-size: 1.15rem; }
+.taxi-details { display: flex; gap: 1.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.taxi-detail { display: flex; flex-direction: column; gap: 0.2rem; }
+.taxi-detail-label { font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; font-weight: 600; }
+.taxi-detail-value { font-size: 1.05rem; font-weight: 600; }
+.taxi-total { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-top: 1px solid #e2e8f0; margin-bottom: 0.75rem; font-weight: 600; }
+.taxi-total-price { font-size: 1.5rem; color: var(--primary); font-weight: 700; }
+.taxi-note { font-size: 0.85rem; color: var(--text-light); margin-bottom: 1rem; }
+
 .hero-sm { padding: 3rem 1.5rem; }
 .section-title-left { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; }
 .transport-layout {
