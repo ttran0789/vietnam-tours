@@ -47,6 +47,9 @@ _db = SessionLocal()
 if not _db.query(SiteConfig).filter(SiteConfig.key == "taxi_rate_per_mile").first():
     _db.add(SiteConfig(key="taxi_rate_per_mile", value="1.60"))
     _db.commit()
+if not _db.query(SiteConfig).filter(SiteConfig.key == "theme").first():
+    _db.add(SiteConfig(key="theme", value="ocean-blue"))
+    _db.commit()
 _db.close()
 
 app = FastAPI(title="Vietnam Tours API")
@@ -298,6 +301,12 @@ async def update_transport_price(route_id: int, request: Request, admin: User = 
 
 # ── Admin Config ─────────────────────────────────────────────────────────
 
+@app.get("/api/config/theme")
+def get_theme(db: Session = Depends(get_db)):
+    cfg = db.query(SiteConfig).filter(SiteConfig.key == "theme").first()
+    return {"theme": cfg.value if cfg else "ocean-blue"}
+
+
 @app.get("/api/admin/config/{key}")
 def get_config(key: str, admin: User = Depends(require_super_admin), db: Session = Depends(get_db)):
     cfg = db.query(SiteConfig).filter(SiteConfig.key == key).first()
@@ -311,8 +320,10 @@ async def update_config(key: str, request: Request, admin: User = Depends(requir
     data = await request.json()
     cfg = db.query(SiteConfig).filter(SiteConfig.key == key).first()
     if not cfg:
-        raise HTTPException(status_code=404, detail="Config not found")
-    cfg.value = str(data["value"])
+        cfg = SiteConfig(key=key, value=str(data["value"]))
+        db.add(cfg)
+    else:
+        cfg.value = str(data["value"])
     db.commit()
     return {"key": cfg.key, "value": cfg.value}
 

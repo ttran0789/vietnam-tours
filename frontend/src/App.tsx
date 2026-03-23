@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
+import { api } from './api'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import TourDetail from './pages/TourDetail'
@@ -18,6 +20,7 @@ import AdminImages from './pages/AdminImages'
 import AdminUsers from './pages/AdminUsers'
 import AdminUpcoming from './pages/AdminUpcoming'
 import AdminPricing from './pages/AdminPricing'
+import AdminSettings from './pages/AdminSettings'
 import ChatWidget from './components/ChatWidget'
 import AdminChat from './pages/AdminChat'
 
@@ -38,6 +41,12 @@ function AdminRoute({ children, superOnly }: { children: React.ReactNode; superO
 }
 
 export default function App() {
+  useEffect(() => {
+    api.getTheme()
+      .then(data => { document.documentElement.setAttribute('data-theme', data.theme) })
+      .catch(() => {})
+  }, [])
+
   return (
     <>
       <Navbar />
@@ -60,6 +69,7 @@ export default function App() {
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
           <Route path="/admin/upcoming" element={<AdminRoute><AdminUpcoming /></AdminRoute>} />
           <Route path="/admin/pricing" element={<AdminRoute superOnly><AdminPricing /></AdminRoute>} />
+          <Route path="/admin/settings" element={<AdminRoute superOnly><AdminSettings /></AdminRoute>} />
           <Route path="/admin/chat" element={<AdminRoute><AdminChat /></AdminRoute>} />
         </Routes>
       </main>

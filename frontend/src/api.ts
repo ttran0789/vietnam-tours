@@ -190,6 +190,8 @@ export const api = {
 
   getTaxiBookings: () => request('/taxi/bookings'),
 
+  getTheme: () => request<{ theme: string }>('/config/theme'),
+
   // Admin config
   getConfig: (key: string) => request<{ key: string; value: string }>(`/admin/config/${key}`),
   updateConfig: (key: string, value: string) =>

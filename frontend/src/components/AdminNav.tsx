@@ -7,6 +7,7 @@ const links = [
   { to: '/admin/users', label: 'Users' },
   { to: '/admin/images', label: 'Photos' },
   { to: '/admin/pricing', label: 'Pricing', superOnly: true },
+  { to: '/admin/settings', label: 'Settings', superOnly: true },
 ]
 
 export default function AdminNav() {
